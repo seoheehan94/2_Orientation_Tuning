@@ -1,0 +1,77 @@
+clear all;
+rng(4228);
+
+%% Load data
+original_folder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/experiment/getImages';
+cd(original_folder);
+img_folder = '/bwdata/NSDData/stimuli'; % Original image file folder
+save_folder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/experiment/rawStimuli';
+% pracSave_folder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/experiment/practiceStimuli';
+
+mean_vecLD = load("mean_vecLD.mat");
+mean_photo = load("mean_photo.mat");
+mean_photo2 = load("mean_photo2.mat");
+mean_photo3 = load("mean_photo3.mat");
+
+meanOri_vecLD = mean_vecLD.meanOri;
+meanOri_photo = [mean_photo.meanOri;mean_photo2.meanOri;mean_photo3.meanOri];
+diff = meanOri_photo-meanOri_vecLD;
+diff_converted = mod(diff + pi/2, pi) - pi/2;
+
+diff(:,2) = rad2deg(diff);
+diff_converted(:,2) = rad2deg(diff_converted);
+
+totalMean = [(1:73000)', meanOri_photo, rad2deg(meanOri_photo), meanOri_vecLD, rad2deg(meanOri_vecLD), diff_converted, abs(diff_converted)];
+totalMean=array2table(totalMean, 'VariableNames',{'imgNum', 'photoM_rad', 'photoM_deg', 'vecLDM_rad', 'vecLDM_deg', 'diff_rad', 'diff_deg', 'absDiff_rad','absDiff_deg'});
+totalMean = sortrows(totalMean, "absDiff_rad", "descend");
+
+% top550
+top550 = totalMean(1:550,:);
+% bottom30 = totalMean(72971:72990,:);
+
+save(fullfile(original_folder, 'top550.mat'), 'top550');
+
+for k = 1: height(top550)
+
+    curIdx = top550.imgNum(k);
+    imgName = ['img' num2str(curIdx) '.png'];
+
+    if curIdx <= 14600*1
+        curImg = [img_folder, '/images01/', imgName];
+    elseif curIdx <= 14600*2
+        curImg = [img_folder, '/images02/', imgName];
+    elseif curIdx <= 14600*3
+        curImg = [img_folder, '/images03/', imgName];
+    elseif curIdx <= 14600*4
+        curImg = [img_folder, '/images04/', imgName];
+    elseif curIdx <= 14600*5
+        curImg = [img_folder, '/images05/', imgName];
+    end
+
+
+    copyfile(curImg, save_folder);
+
+end
+% 
+% 
+% for k = 1: height(bottom30)
+% 
+%     curIdx = bottom30.imgNum(k);
+%     imgName = ['img' num2str(curIdx) '.png'];
+% 
+%     if curIdx <= 14600*1
+%         curImg = [img_folder, '/images01/', imgName];
+%     elseif curIdx <= 14600*2
+%         curImg = [img_folder, '/images02/', imgName];
+%     elseif curIdx <= 14600*3
+%         curImg = [img_folder, '/images03/', imgName];
+%     elseif curIdx <= 14600*4
+%         curImg = [img_folder, '/images04/', imgName];
+%     elseif curIdx <= 14600*5
+%         curImg = [img_folder, '/images05/', imgName];
+%     end
+% 
+% 
+%     copyfile(curImg, pracSave_folder);
+% 
+% end
