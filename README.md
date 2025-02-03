@@ -8,4 +8,16 @@ This study investigates how humans perceive orientation in complex images by com
 ---------
 **EXP 1**
 Orientation Judgement Experiment
- - 
+ - getImages: make images for the experiment
+ - runExperiment: psychophysics experiment files
+ - oriJudgeExp_analysis.R: experiment results analyses
+---------
+**EXP 2**
+Orientation Selectivity in Visual Cortex
+
+Benchmark Model:https://github.com/elimerriam/nsdOtopy
+ - model_computation: image-computable model with three different types of orientation computation
+ - R2_analysis: explained variance of neural data
+ - surfaceAnalysis: surface mapping of neural data
+ - ori_histogram: orientation distribution in images 
+
