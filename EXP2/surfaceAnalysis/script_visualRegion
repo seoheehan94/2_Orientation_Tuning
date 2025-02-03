@@ -1,0 +1,31 @@
+#combine dorsal and ventral
+/bwdata/NSDData/nsddata/freesurfer/fsaverage/label
+
+mri_concat --i lh.probmap_V1d.mgz --i lh.probmap_V1v.mgz --o lh.probmap_V1_combined.mgz --sum
+mri_concat --i lh.probmap_V2d.mgz --i lh.probmap_V2v.mgz --o lh.probmap_V2_combined.mgz --sum
+mri_concat --i lh.probmap_V3d.mgz --i lh.probmap_V3v.mgz --o lh.probmap_V3_combined.mgz --sum
+
+mri_concat --i rh.probmap_V1d.mgz --i rh.probmap_V1v.mgz --o rh.probmap_V1_combined.mgz --sum
+mri_concat --i rh.probmap_V2d.mgz --i rh.probmap_V2v.mgz --o rh.probmap_V2_combined.mgz --sum
+mri_concat --i rh.probmap_V3d.mgz --i rh.probmap_V3v.mgz --o rh.probmap_V3_combined.mgz --sum
+
+
+
+
+#make it into a label
+mri_cor2label --i lh.probmap_V1_combined.mgz --thresh 0.1 --l ./labels/lh.V1.label --surf fsaverage lh
+mri_cor2label --i lh.probmap_V2_combined.mgz --thresh 0.1 --l ./labels/lh.V2.label --surf fsaverage lh
+mri_cor2label --i lh.probmap_V3_combined.mgz --thresh 0.1 --l ./labels/lh.V3.label --surf fsaverage lh
+mri_cor2label --i lh.probmap_hV4.mgz --thresh 0.1 --l ./labels/lh.V4.label --surf fsaverage lh
+
+mri_cor2label --i rh.probmap_V1_combined.mgz --thresh 0.1 --l ./labels/rh.V1.label --surf fsaverage rh
+mri_cor2label --i rh.probmap_V2_combined.mgz --thresh 0.1 --l ./labels/rh.V2.label --surf fsaverage rh
+mri_cor2label --i rh.probmap_V3_combined.mgz --thresh 0.1 --l ./labels/rh.V3.label --surf fsaverage rh
+mri_cor2label --i rh.probmap_hV4.mgz --thresh 0.1 --l ./labels/rh.V4.label --surf fsaverage rh
+
+
+mri_mergelabels -i ./labels/lh.V1.label -i ./labels/lh.V2.label -i ./labels/lh.V3.label -i ./labels/lh.V4.label -o ./labels/lh.combined.label
+
+
+freeview -f /bwdata/NSDData/nsddata/freesurfer/fsaverage/surf/lh.inflated:no_shading=1
+tksurfer fsaverage lh inflated
