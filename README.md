@@ -13,7 +13,9 @@ Orientation Judgement Experiment
 **EXP 2**
 Orientation Selectivity in Visual Cortex
 
-Benchmark Model:https://github.com/elimerriam/nsdOtopy
+Benchmark Model:https://github.com/elimerriam/nsdOtopy 
+
+(Roth, Z. N., Kay, K., & Merriam, E. P. (2022). Natural scene sampling reveals reliable coarse-scale orientation tuning in human V1. Nature communications, 13(1), 6469.)
  - model_computation: image-computable model with three different types of orientation computation
  - R2_analysis: explained variance of neural data
  - surfaceAnalysis: surface mapping of neural data
