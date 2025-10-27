@@ -6,9 +6,15 @@ This study investigates how humans perceive orientation in complex images by com
 ---------
 **EXP 1**
 Orientation Judgement Experiment
- - getImages: make images for the experiment
+ - getImages
+   - getPatches.m: generate max/min patches used for experiment stimuli
+     - Orientation computed by Steerable pyramid filter from Roth et al. (2022) (https://github.com/elimerriam/nsdOtopy)
+     - Orientation computed by Contour from Walther et al. (2023) (https://github.com/bwlabToronto/MLV_toolbox)
+   - makeGratings.m: generate grating images used for experiment stimuli
+   - saveImages.m: saves figures for paper
  - runExperiment: psychophysics experiment files
  - oriJudgeExp_analysis.R: experiment results analyses
+ - 
 ---------
 **EXP 2**
 Orientation Selectivity in Visual Cortex
