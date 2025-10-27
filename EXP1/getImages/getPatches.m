@@ -90,6 +90,7 @@ for imgIdx = 1:550
             maskedSection_vecLD = model.vecLD .* shiftedMask;
 
             % Calculate the mean of the masked section
+            keyboard;
             allValues_photo = squeeze(mean(maskedSection_photo,[2 3], "omitnan"));
             curMean_photo = circ_mean(theta',allValues_photo);
             curMean_photo = mod(curMean_photo,2*pi);%from [-pi, pi] to [0 2pi]

@@ -15,7 +15,7 @@ close all
 clear all
 tic
 
-condition =1; %1=old, 2=ori, 3=control
+condition =2; %1=old, 2=ori, 3=control
 
 figRoi=1;
 pvalThresh = 0.025;
@@ -90,12 +90,15 @@ elseif condition == 3
 end
 
 % Variations of the base color
-vertColor = baseColor * 1.2;  % Slightly lighter (scaled up to brighten)
-cardColor = baseColor;         % Original color
+% vertColor = baseColor * 1.2;  % Slightly lighter (scaled up to brighten)
+vertColor = baseColor * 0.8;
+cardColor = baseColor* 0.8;         % Original color
 radColor = baseColor * 0.8;    % Slightly darker (scaled down to darken)
 
 % Ensure the values stay within [0, 1] range
-vertColor = min(vertColor, 1);  % Cap values to 1
+% vertColor = min(vertColor, 1);  % Cap values to 1
+vertColor = max(radColor, 0);    % Ensure values stay above 0
+cardColor = max(radColor, 0);    % Ensure values stay above 0
 radColor = max(radColor, 0);    % Ensure values stay above 0
 
 r2Color = [156,222,214]/255;%turquoise
@@ -145,7 +148,7 @@ allSubInd = cell(1,nrois);
 
 for isub=1:length(subjects)
     subnum = subjects(isub);
-    load([prffolder 'voxModelPref_sfmean_regress_sub' num2str(isub) '.mat'],'allRoiPrf',...
+    load([prffolder 'voxModelPref_regress_sub' num2str(isub) '.mat'],'allRoiPrf',...
         'roiOri','roiNsdOriR2',...
         'roiOriDeviation','roiVertDeviation','roiCardDeviation',...
         'visRoiData','roiNames','combinedRoiNames','roiInd','prefAnalysis','nsplits');
@@ -471,11 +474,11 @@ thetaticks(0:45:315); thetaticklabels({'0','','\pi/2','', '\pi','','3\pi/2',''})
 set(gcf,'position',[150 180 420 740]);
 
 if condition == 1
-    figName = 'quantMap_old';
+    figName = 'quantMap_old2';
 elseif condition == 2
-    figName = 'quantMap_ori';
+    figName = 'quantMap_ori2';
 elseif condition == 3
-    figName = 'quantMap_control';
+    figName = 'quantMap_control2';
 end
 
 if toSavePdf

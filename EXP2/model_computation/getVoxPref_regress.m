@@ -266,6 +266,7 @@ for iregion=1:numregions
             prefAngle =[];
             fullCoef = squeeze(nsd.voxOriCoef{iroi}(isplit,:,1:end-1));
             numvox = size(fullCoef,1);
+            keyboard;
             % if con == 1 || con ==3
             coefMat = reshape(fullCoef,numvox,numLevels,numOrientations);%vox x levels x orientations
             coefMat_meansf = squeeze(mean(coefMat, 2));
@@ -273,7 +274,7 @@ for iregion=1:numregions
             %     coefMat_meansf = fullCoef;
             % end
             coefMat_meansf = coefMat_meansf - min(coefMat_meansf,[],2);
-            keyboard;
+            
             theta = linspace(0,2*pi,numOrientations+1);%for circular calculation
             theta = theta(1:end-1);
             for ivox=1:numvox

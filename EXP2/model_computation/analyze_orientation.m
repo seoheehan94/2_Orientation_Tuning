@@ -14,15 +14,18 @@ prffolders = {'prfsample', 'prfsample_Ori', 'prfsample_Ori_control'};
 totalR2OriSplit = struct;
 totalaicOriSplit = struct;
 totalbicOriSplit = struct;
-for con = [1,3]
+for con = [1, 2, 3]
     totalR2OriSplit.(conditions{con}) = {};
     totalaicOriSplit.(conditions{con}) = {};
     totalbicOriSplit.(conditions{con}) = {};
     for isub = 1:8
         curPrf = ['/bwdata/NSDData/Seohee/Orientation/', prffolders{con}, '/'];
         fprintf('isub:%d. con:%d. ...\n',isub,con);
-        load([curPrf 'voxModelPref_sfmean_regress_sub' num2str(isub) '.mat']);
-
+        if con == 1 || con == 3
+            load([curPrf 'voxModelPref_sfmean_regress_sub' num2str(isub) '.mat']);
+        else
+            load([curPrf 'voxModelPref_regress_sub' num2str(isub) '.mat']);
+        end
         %% total values of R2, aic, bic
         totalR2OriSplit.(conditions{con}){end+1} = roiNsdOriR2;
         totalaicOriSplit.(conditions{con}){end+1} = allaicOriSplit;
@@ -38,6 +41,9 @@ V1R2OriSplit=[];
 for i = 1:numel(fieldsCon)
     curRoiR2OriSplit = [];
     curV1R2OriSplit = [];
+    curV2R2OriSplit = [];
+    curV3R2OriSplit = [];
+    curV4R2OriSplit = [];
 
     for j = 1:numel(totalR2OriSplit.(fieldsCon{i}))
         for k = 1:size(roiNsdOriR2,2)
@@ -45,9 +51,15 @@ for i = 1:numel(fieldsCon)
         end
 
         curV1R2OriSplit = [curV1R2OriSplit, totalR2OriSplit.(fieldsCon{i}){j}{1}(3,:)];
+        curV2R2OriSplit = [curV2R2OriSplit, totalR2OriSplit.(fieldsCon{i}){j}{2}(3,:)];
+        curV3R2OriSplit = [curV3R2OriSplit, totalR2OriSplit.(fieldsCon{i}){j}{3}(3,:)];
+        curV4R2OriSplit = [curV4R2OriSplit, totalR2OriSplit.(fieldsCon{i}){j}{4}(3,:)];
     end
     % writematrix(curRoiR2OriSplit', ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/allroiR2_sfmean', '_', (fieldsCon{i}), '.csv']);
-    % writematrix(curV1R2OriSplit', ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/V1R2', imgType{curimgtype}, '_', (fieldsCon{i}), '.csv']);
+    writematrix(curV1R2OriSplit', ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/V1R2', (fieldsCon{i}), '.csv']);
+    writematrix(curV2R2OriSplit', ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/V2R2', (fieldsCon{i}), '.csv']);
+    writematrix(curV3R2OriSplit', ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/V3R2', (fieldsCon{i}), '.csv']);
+    writematrix(curV4R2OriSplit', ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/V4R2', (fieldsCon{i}), '.csv']);
 
     allroiR2OriSplit(i) = mean(curRoiR2OriSplit, 'omitnan');
     V1R2OriSplit(i) = mean(curV1R2OriSplit,'omitnan');

@@ -101,7 +101,7 @@ end
  set(gcf, 'Position', [100, 100, 750, 900]); % Set the figure size if desired
 
 % Save the figure as a PNG file
-saveas(gcf, '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/figures/energy_photofilter.png');
+%saveas(gcf, '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/figures/energy_photofilter.png');
 
 %% line drawing - filter
 vecLD = traceLineDrawingFromRGB(imgFile);
