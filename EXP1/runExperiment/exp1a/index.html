@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Orientation Judgment Experiment</title>
+    <meta charset="UTF-8">
+    <script src="https://unpkg.com/jspsych@7.3.4"></script>
+
+    <!-- Load jsPsych plug-ins -->
+    <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-preload@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-call-function@1.1.3"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-resize@1.0.0"></script>
+    <script src="https://unpkg.com/@jspsych/plugin-fullscreen@1.1.0"></script>
+
+    <!-- Load CSS styles -->
+    <link href="https://unpkg.com/jspsych@7.3.4/css/jspsych.css" rel="stylesheet" type="text/css" />
+
+    <!-- Load Pavlovia plugins -->
+    <script type="text/javascript" src="lib/vendors/jquery-2.2.0.min.js"></script>
+    <script type="text/javascript" src="jspsych-7-pavlovia-2021.12.js"></script>
+    <style>
+        body {
+            background-color: grey;
+        }
+
+        .jspsych-display-element {
+            font-size: 38px;
+            color: white;
+        }
+    </style>
+</head>
+
+<body></body>
+<script>
+    /* initiate JsPsych */
+    const jsPsych = initJsPsych({
+        on_finish: function () {
+            //jsPsych.data.displayData(); //Erase before Experiment!!!!!!!!!!!!!!
+        }
+    });
+
+    // Capture info
+    let participant_id = jsPsych.data.getURLVariable('participant');
+    participant_id = participant_id.toString().padStart(2, '0'); // Pads the number with a leading zero if it's a single digit
+    let condition = (parseInt(participant_id) % 2 === 0) ? 'average' : 'average';
+    jsPsych.data.addProperties({
+        participant: participant_id,
+        condition: condition
+    });
+
+    /* Create Timeline */
+    var timeline = [];
+    var pavloviaInfo;
+
+    /* Init connection with pavlovia.org */
+    var pavlovia_init = {
+        type: jsPsychPavlovia,
+        command: "init",
+        setPavloviaInfo: function (info) {
+            console.log(info);
+            pavloviaInfo = info;
+        }
+    };
+    timeline.push(pavlovia_init);
+
+    /* Load participant trial data (JSON) */
+    const trialDataUrl = `participant_conditions/sub${participant_id}_conditions.json`;
+    let participantTrials = [];
+    let practiceTrials = [];
+
+    fetch(trialDataUrl)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to load participant trial data');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Prepend 'stimuli/' to each imageName in participantTrials
+            participantTrials = data.trials.map(trial => ({
+                ...trial,  // Keep other trial properties
+                imageName: `stimuli/${trial.imageName}`  // Add the 'stimuli/' prefix to imageName
+            }));
+            return fetch('practiceImages.json');  // Load practice images
+        })
+        .then(response => response.json())
+        .then(practiceData => {
+            practiceTrials = practiceData.practiceImages.slice(0, 10).map(practiceImage => ({
+                imageName: `practiceStimuli/${practiceImage.imageName}`,
+                rotationAngle: Math.floor(Math.random() * 360)
+            }));
+
+            const preloadImages = participantTrials.map(trial => trial.imageName);
+            const PreloadPracImages = practiceTrials.map(practice => practice.imageName);
+            const FullPreloadList = preloadImages.concat(PreloadPracImages);
+
+            /* Preload images */
+            timeline.push({
+                type: jsPsychPreload,
+                images: FullPreloadList,
+                message: 'Please wait while the experiment loads.',
+                error_message: 'The experiment failed to load.',
+                show_detailed_errors: true
+            });
+
+            setupTimeline();  // Call a function to setup other parts of the timeline
+        })
+        .catch(error => {
+            console.error('Error loading trial data:', error);
+            alert('Failed to load participant trial data.');
+        });
+
+    function setupTimeline() {
+        /* Notice Phase */
+        // Fullscreen mode //
+        timeline.push({
+            type: jsPsychFullscreen,
+            fullscreen_mode: true
+        });
+
+        // 1. Welcome 
+        var welcome = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: "Welcome to the experiment. Press any key to begin."
+        };
+        timeline.push(welcome);
+
+        // 2. Resize display
+        var inputs = {
+            type: jsPsychResize,
+            item_width: 3 + 3 / 8,
+            item_height: 2 + 1 / 8,
+            prompt: `
+                <p>We will measure your screen size for the accurate image presentation. You will need a credit or ID card.</p>
+                <p>Click and drag the lower right corner of the box until the box is the same size as the card held up to the screen.</p>
+                `,
+            pixels_per_unit: 130
+        };
+        timeline.push(inputs);
+
+        // Hide cursor 
+        var cursor_off = {
+            type: jsPsychCallFunction,
+            func: function () {
+                document.body.style.cursor = "none";
+            }
+        }
+        timeline.push(cursor_off);
+
+        // 3. Instructions 
+        let instructions = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+                <p>In this experiment, you will view a series of images.<br>
+                Your task is to report the '${condition}' orientation of each image.<br> 
+                First, you will view an image, and then you will be asked to adjust a red bar<br>
+                to match the '${condition}' orientation you perceived.<br> 
+                Afterward, you will rate how confident you were in your response.<br> 
+                The experiment consists of 8 blocks in total.<br><br>
+                Press the 'spacebar' to continue.</p>
+                `,
+            choices: [' '],
+            post_trial_gap: 2000
+        };
+        timeline.push(instructions);
+
+        let instructions2 = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: `
+            <div style="text-align: center;">
+                <p>Here are two examples of images and their correct bar orientations in red:</p>
+                <div>
+                   <canvas id="example1" width="142" height="142" style="border:1px solid grey;"></canvas>
+                </div>
+                <div>
+                    <canvas id="example2" width="142" height="142" style="border:1px solid grey;"></canvas>
+                </div>
+            </div>
+            <p>Remember, the task is 'NOT' choosing the upright orientation of the image.</p>
+            <p>The task is to respond to the '${condition}' orientation that you perceive in the image.</p>
+            <p>Press the 'spacebar' to begin the practice trials.</p>
+            `,
+            choices: [' '],
+            on_load: function () {
+                // Draw first image and correct bar orientation on the canvas
+                const canvas1 = document.getElementById('example1');
+                const ctx1 = canvas1.getContext('2d');
+                const img1 = new Image();
+                img1.src = 'samples/img37499_min.png';  // First image
+                img1.onload = function () {
+                    ctx1.drawImage(img1, 0, 0, 142, 142);  // Image size 142x142
+                    drawBarOnCanvas(ctx1, 142, 142, 1.47);  // Bar angle for first image
+                };
+
+                // Draw second image and correct bar orientation on the canvas
+                const canvas2 = document.getElementById('example2');
+                const ctx2 = canvas2.getContext('2d');
+                const img2 = new Image();
+                img2.src = 'samples/img23068_min.png';  // Second image
+                img2.onload = function () {
+                    ctx2.drawImage(img2, 0, 0, 142, 142);  // Image size 142x142
+                    drawBarOnCanvas(ctx2, 142, 142, 67.1);  // Bar angle for second image
+                };
+            },
+            post_trial_gap: 2000
+        };
+
+        // Function to draw a red bar on the canvas at a specified angle
+        function drawBarOnCanvas(ctx, width, height, angle) {
+            const barLength = 100;  // As per your specification
+            const barWidth = 5;
+
+            // Calculate the bar's endpoints based on the angle
+            const x1 = width / 2 + Math.cos((90 - angle) * Math.PI / 180) * barLength / 2;
+            const y1 = height / 2 - Math.sin((90 - angle) * Math.PI / 180) * barLength / 2;
+            const x2 = width / 2 - Math.cos((90 - angle) * Math.PI / 180) * barLength / 2;
+            const y2 = height / 2 + Math.sin((90 - angle) * Math.PI / 180) * barLength / 2;
+
+            // Draw the red bar
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = barWidth;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+        timeline.push(instructions2);
+
+
+        /* Define trials */
+        // Fixation cross
+        const fixation = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: '<div style="font-size: 48px;">+</div>',
+            choices: "NO_KEYS",
+            trial_duration: 500  // 500ms fixation
+        };
+
+        let trialData = {};  // Object to hold the trial data
+        // Bar orientation task with mouse
+        const barResponse = (trial, trialIndex, trialPhase, block) => {
+            return {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: function () {
+                    return `
+                        <canvas id="stimCanvas" width="800" height="600"></canvas>
+                        <p>Move your mouse to adjust the red bar. Click to confirm.</p>
+                    `;
+                },
+                choices: "NO_KEYS",  // No keyboard input, only mouse
+                trial_duration: 20000,  // 20 seconds timeout for each trial
+                on_load: function () {
+                    const canvas = document.getElementById('stimCanvas');
+                    const ctx = canvas.getContext('2d');
+                    const grey = '#808080';  // Grey background color
+                    const barLength = 100;
+                    const barWidth = 5;
+                    const sensitivity = 0.2; // Adjusted sensitivity to match MATLAB
+                    let startOrientation = Math.random() * 180;  // Random initial bar orientation [0, 180)
+                    let barAngle = startOrientation;
+                    let startX = canvas.width / 2;
+                    let startTime = performance.now();  // Capture the time when the trial starts
+
+                    ctx.fillStyle = grey;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                    // Load the image and rotate it based on trial rotation angle
+                    const img = new Image();
+                    img.src = trial.imageName;  // Image source from the trial data
+                    img.onload = function () {
+                        // Draw the image
+                        ctx.save();  // Save the canvas state
+                        ctx.translate(canvas.width / 2, canvas.height / 2);  // Move the rotation center to the center of the canvas
+                        ctx.rotate(trial.rotationAngle * Math.PI / 180);  // Rotate the image
+                        ctx.drawImage(img, -71, -71, 142, 142);  // Draw the image at (0,0) with the size 142x142
+                        ctx.restore();  // Restore the canvas state
+
+                        // Delay drawing the red bar by 200ms
+                        setTimeout(() => {
+                            drawBar(barAngle);  // Draw the red bar on top after 200ms
+                        }, 200);
+                    };
+
+                    // Function to draw the red bar at a given angle
+                    const drawBar = (angle) => {
+                        // Clear the canvas
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                        ctx.fillStyle = grey;
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                        // Redraw the rotated image
+                        ctx.save();  // Save the canvas state
+                        ctx.translate(canvas.width / 2, canvas.height / 2);  // Move the rotation center to the center of the canvas
+                        ctx.rotate(trial.rotationAngle * Math.PI / 180);  // Rotate the image
+                        ctx.drawImage(img, -71, -71, 142, 142);  // Draw the image at (0,0) with the size 142x142
+                        ctx.restore();  // Restore the canvas state
+
+                        // Calculate the bar's endpoints based on the angle
+                        const x1 = canvas.width / 2 + Math.cos((90 - angle) * Math.PI / 180) * barLength / 2;
+                        const y1 = canvas.height / 2 - Math.sin((90 - angle) * Math.PI / 180) * barLength / 2;
+                        const x2 = canvas.width / 2 - Math.cos((90 - angle) * Math.PI / 180) * barLength / 2;
+                        const y2 = canvas.height / 2 + Math.sin((90 - angle) * Math.PI / 180) * barLength / 2;
+
+                        // Draw the red bar
+                        ctx.strokeStyle = 'red';
+                        ctx.lineWidth = barWidth;
+                        ctx.beginPath();
+                        ctx.moveTo(x1, y1);
+                        ctx.lineTo(x2, y2);
+                        ctx.stroke();
+                    };
+
+                    // Add event listener to adjust bar orientation based on mouse movement
+                    const mouseMoveListener = function (event) {
+                        const mouseX = event.clientX - canvas.getBoundingClientRect().left;
+                        const deltaX = mouseX - startX;
+                        barAngle -= sensitivity * deltaX;  // Update bar angle based on mouse movement
+                        barAngle = ((barAngle % 180) + 180) % 180;  // Keep angle within [0, 180), vertical = 0
+                        drawBar(barAngle);
+                        startX = mouseX;  // Update starting point for next frame
+                    };
+                    document.addEventListener('mousemove', mouseMoveListener);
+
+                    // Add event listener to confirm bar orientation with a mouse click
+                    const clickListener = function () {
+                        const barResponseTime = performance.now() - startTime;  // Calculate response time
+
+                        // Save trial data
+                        trialData = {
+                            participantID: participant_id,
+                            trial_phase: trialPhase,
+                            block: block,
+                            trial: trialIndex + 1,
+                            image_name: trial.imageName,
+                            imageDuration: barResponseTime + 200,
+                            rotationAngle: trial.rotationAngle,
+                            startOrientation: startOrientation,
+                            response_orientation: barAngle,
+                            bar_response_time: barResponseTime
+                        };
+
+                        //console.log(`barResponseTime: ${barResponseTime}`);
+
+                        if (barResponseTime < 800) {
+                            // Show warning screen if response time is less than 800ms
+                            jsPsych.pauseExperiment();  // Pause the experiment timeline
+
+                            // Manually present the warning message
+                            jsPsych.getDisplayElement().innerHTML = `
+                            <div style="text-align:center;">
+                                <p>Please respond as accurately as possible.</p>
+                                <p>Your participation is very important to this study.</p>
+                                <p>Press the 'spacebar' to continue.</p>
+                            </div>
+                        `;
+
+                            // Add event listener to resume experiment on spacebar press
+                            document.addEventListener('keydown', function handler(e) {
+                                if (e.code === 'Space') {
+                                    document.removeEventListener('keydown', handler);  // Remove the event listener
+                                    jsPsych.resumeExperiment();  // Resume the experiment timeline
+                                }
+                            });
+                        }
+
+                        // Clean up event listeners to prevent multiple triggers
+                        document.removeEventListener('mousemove', mouseMoveListener);
+                        document.removeEventListener('click', clickListener);
+
+                        jsPsych.finishTrial();
+                    };
+                    document.addEventListener('click', clickListener);
+                }
+            };
+        };
+
+        // Confidence rating scale
+        const confidenceRating = {
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: "<p>Rate your confidence in the previous response (1=low, 5=high).</p>",
+            choices: ['1', '2', '3', '4', '5'],  // Keys for confidence rating
+            prompt: "<p>1 2 3 4 5</p>",
+            on_finish: function (data) {
+                // Add confidence level to trialData
+                trialData.confidenceLevel = parseInt(data.response);
+
+                // Save everything to the same row
+                jsPsych.data.write(trialData);  // Write the combined trial data (including confidence level) to the data object
+
+                jsPsych.finishTrial();
+            }
+        };
+
+        /* Practice phase (10 practice trials) */
+        practiceTrials.forEach((trial, index) => {
+            timeline.push(fixation);
+            timeline.push(barResponse(trial, index, 'practice'));
+            timeline.push(confidenceRating);
+        });
+
+        // End Practice Phase Notice
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: '<p>Practice phase is done. Press spacebar to begin the experiment.</p>',
+            choices: [' ']
+        });
+
+        /* Main experiment phase */
+        const trialsPerBlock = 58;
+        participantTrials.forEach((trial, index) => {
+            const block = Math.floor(index / trialsPerBlock) + 1
+
+            timeline.push(fixation);
+            timeline.push(barResponse(trial, index, 'main', block));
+            timeline.push(confidenceRating);
+
+            // Insert a break after every block of trials (56 trials per block)
+            if ((index + 1) % trialsPerBlock === 0 && index < participantTrials.length - 1) {
+                timeline.push({
+                    type: jsPsychHtmlKeyboardResponse,
+                    stimulus: `<p>Take a short break. Blocks left: ${(participantTrials.length - (index + 1)) / trialsPerBlock}. Press spacebar to continue.</p>`,
+                    choices: [' ']
+                });
+            }
+        });
+
+        // Show cursor //
+        var cursor_on = {
+            type: jsPsychCallFunction,
+            func: function () {
+                document.body.style.cursor = "auto";
+            }
+        }
+        timeline.push(cursor_on);
+
+        timeline.push({
+            type: jsPsychHtmlKeyboardResponse,
+            stimulus: '<p>Thank you for participating! Press any key to exit.</p>',
+            choices: "ALL_KEYS"
+        });
+
+        /* Finish connection with pavlovia.org */
+        var pavlovia_finish = {
+            type: jsPsychPavlovia,
+            command: "finish",
+            participantId: participant_id,
+            dataFilter: function (data) {
+                return data;
+            },
+            completedCallback: function () {
+                alert('data successfully submitted!');
+            }
+        };
+
+        timeline.push(pavlovia_finish);
+
+        /* Start the experiment */
+        jsPsych.run(timeline);
+    }
+</script>
+
+</html>
