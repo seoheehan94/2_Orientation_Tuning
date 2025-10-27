@@ -12,9 +12,9 @@ Orientation Judgement Experiment
      - Orientation computed by Contour from Walther et al. (2023) (https://github.com/bwlabToronto/MLV_toolbox)
    - makeGratings.m: generate grating images used for experiment stimuli
    - saveImages.m: saves figures for paper
- - runExperiment: psychophysics experiment files
- - oriJudgeExp_analysis.R: experiment results analyses
- - 
+ - runExperiment: psychophysics experiment files for exp1a and exp1b
+ - dataAnalysis: experiment data and analysis for exp1a and exp1b
+  
 ---------
 **EXP 2**
 Orientation Selectivity in Visual Cortex
