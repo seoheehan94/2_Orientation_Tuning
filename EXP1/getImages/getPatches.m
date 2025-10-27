@@ -1,3 +1,12 @@
+% getPatches.m
+%
+% purpose: generate max/min patches used for experiment stimuli
+% 
+% needs to compute orientation responses from an image from below methods 
+% Steerable pyramid: https://github.com/elimerriam/nsdOtopy
+% MLV toolbox: https://github.com/bwlabToronto/MLV_toolbox
+
+
 clear all;
 rng(4228);
 

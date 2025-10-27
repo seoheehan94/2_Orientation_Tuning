@@ -1,3 +1,11 @@
+makeGratings.m
+%
+% purpose: generate grating images used for experiment stimuli
+% 
+
+
+
+
 interpDeg = 8.4;
 width = 142; % Image width and height (square grid)
 pixPerDeg = width / interpDeg;
