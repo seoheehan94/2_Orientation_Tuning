@@ -18,11 +18,19 @@ Orientation Judgement Experiment
 ---------
 **EXP 2**
 Orientation Selectivity in Visual Cortex
-
-Benchmark Model:https://github.com/elimerriam/nsdOtopy 
-
-(Roth, Z. N., Kay, K., & Merriam, E. P. (2022). Natural scene sampling reveals reliable coarse-scale orientation tuning in human V1. Nature communications, 13(1), 6469.)
+Three models
+1. Photo-Steerable Pyramid (photoSP) - replication of Roth et al. (2022)
+   - https://github.com/elimerriam/nsdOtopy 
+   - Roth, Z. N., Kay, K., & Merriam, E. P. (2022). Natural scene sampling reveals reliable coarse-scale orientation tuning in human V1. Nature communications, 13(1), 6469.
+2. Line Drawing-Steerable Pyramid (ldSP)
+3. Contour
+   
  - model_computation: image-computable model with three different types of orientation computation
+   - nsd_stim.m: run natural scene stimuli through the models, get energy responses
+   - prfSampleModel.m: use voxel pRFs to sample model response outputs
+   - regressPrfSplit.m: perform linear regression on the response amplitudes for each voxel with orientation response output values as predictors
+   - getVoxProf.m: extract preferred orientation from regression weights for each voxel
+   - runAllFiles.m: run prfSampleModel, regressPrfSplit, getVoxProf for all three models
  - R2_analysis: explained variance of neural data
  - surfaceAnalysis: surface mapping of neural data
  - ori_histogram: orientation distribution in images 
