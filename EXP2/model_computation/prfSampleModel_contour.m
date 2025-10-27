@@ -1,4 +1,4 @@
-% prfSampleModel.m
+% prfSampleModel_contour.m
 %
 % associated with the following publication: Roth, ZN, Kay, K, and Merriam, EP (2022).
 % Massive natural scene sampling reveals reliable coarse-scale orientation tuning in human V1
@@ -7,13 +7,13 @@
 %   usage: prfSampleModel(1,1)
 %   by: zvi roth
 %   date: 7/29/2022
-%   purpose: use voxel pRFs to sample model energy outputs for natural
+%   purpose: use voxel pRFs to sample model response outputs for natural
 %   images stimuli
 %   uses files created by: nsdStim.m
 %   creates files used by: regressPrfSplit.m
 
-function prfSampleModel(isub,visualRegion)
-% addpath(genpath('/home/hanseohe/Documents/GitHub/stimulusVignetting'))
+function prfSampleModel_contour(isub,visualRegion)
+%cd '/home/hanseohe/Documents/GitHub/nsdOtopy';
 delete(gcp('nocreate'));
 g=gcp
 distcomp.feature( 'LocalUseMpiexec', false ); % https://www.mathworks.com/matlabcentral/answers/447051-starting-matlab-pool-hangs-in-2018b
@@ -34,9 +34,9 @@ imgScaling = 0.5;
 
 bandwidth = 1;
 numOrientations = 8;
-dims = [backgroundSize backgroundSize];
-dims = dims*imgScaling;
-numLevels = maxLevel(dims,bandwidth);
+dims = [512 512];
+%numLevels = maxLevel(dims,bandwidth);
+numLevels = 1;
 
 switch visualRegion
     case 1
@@ -54,7 +54,7 @@ x = -(backgroundSize*imgScaling)/2+0.5:(backgroundSize*imgScaling)/2-0.5;
 y = -(backgroundSize*imgScaling)/2+0.5:(backgroundSize*imgScaling)/2-0.5;
 [X,Y] = meshgrid(x,-y);%flip up-down
 
-pyramidfolder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/stimuli/pyramid/';%to save model outputs
+orifolder = '/bwdata/NSDData/Seohee/stimuli/contour/';%to save model outputs
 betasfolder = ['/bwdata/NSDData/nsddata/ppdata/subj0' num2str(isub) '/func1pt8mm/'];
 angFile = fullfile(betasfolder,'prf_angle.nii.gz');
 eccFile = fullfile(betasfolder,'prf_eccentricity.nii.gz');
@@ -75,7 +75,6 @@ tic
 roiData = visRoiData;
 
 roiPrf = cell(length(rois),1);
-prfSampleLev = cell(length(rois),1);
 prfSampleLevOri = cell(length(rois),1);
 
 
@@ -98,53 +97,46 @@ for roinum=1:length(rois)
     roiPrf{roinum}.x = x0;
     roiPrf{roinum}.y = y0;
     
-    prfSampleLevRoi = zeros(length(allImgs),nvox,numLevels);
     prfSampleLevOriRoi = zeros(length(allImgs),nvox,numLevels, numOrientations);
     
     %loop through  images
     parfor iimg=1:length(allImgs)
         ['sub: ' num2str(isub) ', roi: ' num2str(iroi) ', image: ' num2str(iimg)]
         imgNum = allImgs(iimg);
-        pyramidfilename = ['pyrImg' num2str(imgNum) '.mat'];
-        data = load(fullfile(pyramidfolder, pyramidfilename),'sumOri','modelOri');
-         % if isfile(fullfile(pyramidfolder, pyramidfilename))
-         %    data = load(fullfile(pyramidfolder, pyramidfilename),'sumOri','modelOri');
-         % else
-         %    data = load(fullfile('/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/stimuli/pyramid/subj06', pyramidfilename),'sumOri','modelOri');
-         % end
-        imgPrfSampleLev = zeros(nvox,numLevels);
+        orifilename = ['oriImg' num2str(imgNum) '.mat'];
+        data = load(fullfile(orifolder, orifilename),'modelOri');
         imgPrfSampleLevOri = zeros(nvox,numLevels,numOrientations);
         %loop through voxels
         for ivox=1:nvox
-            %sample for each pyramid level (summed across orientations!)
-            voxPrfSampleLev = zeros(numLevels,1);
+            %sample for each ori level (summed across orientations!)
             voxPrfSampleLevOri = zeros(numLevels,numOrientations);
             %create the pRF for this voxel
             G = exp(-((X-x0(ivox)).^2+(Y-y0(ivox)).^2)/(2*sz(ivox)^2));
             
             for ilev = 1:numLevels
                 voxPrfSampleOri = zeros(numOrientations,1);
-                voxPrfSampleLev(ilev) = data.sumOri{ilev}(:)'*G(:);
                 for iori=1:numOrientations
-                    temp = data.modelOri{ilev}(iori,:,:);
+                    temp = data.modelOri(iori,:,:);
                     voxPrfSampleOri(iori) = temp(:)'*G(:);
                 end
                 voxPrfSampleLevOri(ilev,:) = voxPrfSampleOri;
             end
             imgPrfSampleLevOri(ivox,:,:) = voxPrfSampleLevOri;
-            imgPrfSampleLev(ivox,:) = voxPrfSampleLev;
         end
-        prfSampleLevRoi(iimg,:,:) = imgPrfSampleLev;
         prfSampleLevOriRoi(iimg,:,:,:) = imgPrfSampleLevOri;
     end
-    prfSampleLev{roinum} = prfSampleLevRoi;
     prfSampleLevOri{roinum} = prfSampleLevOriRoi;
+
+    prffolder = '/bwdata/NSDData/Seohee/Orientation/prfsample_contour/';
+    save(fullfile(prffolder,['prfSampleStim_ori_v' num2str(visualRegion) '_sub' num2str(isub) '.mat']),'prfSampleLevOri',...
+        'rois','allImgs','numLevels','numOrientations','interpImgSize','backgroundSize','pixPerDeg',...
+        'roiPrf','-v7.3');
 end
 
-prffolder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/prfsample/';
-save(fullfile(prffolder,['prfSampleStim_v' num2str(visualRegion) '_sub' num2str(isub) '.mat']),'prfSampleLevOri','prfSampleLev',...
-    'rois','allImgs','numLevels','numOrientations','interpImgSize','backgroundSize','pixPerDeg',...
-    'roiPrf','-v7.3');
+% prffolder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/prfsample/';
+% save(fullfile(prffolder,['prfSampleStim_v' num2str(visualRegion) '_sub' num2str(isub) '.mat']),'prfSampleLevOri','prfSampleLev',...
+%     'rois','allImgs','numLevels','numOrientations','interpImgSize','backgroundSize','pixPerDeg',...
+%     'roiPrf','-v7.3');
 delete(g);
 
 %% CSS pRF from Kay et al., J Neurophysiology, 2013
@@ -154,3 +146,7 @@ delete(g);
         r = g*((S(:)'*G(:))^n);
     end
 end
+
+
+%%
+%%figure; hold on; for ori=1:8;plot(squeeze(prfSampleLevOri{1,1}(1:100,23,1,ori)),'-','Color',colors(ori,:));end

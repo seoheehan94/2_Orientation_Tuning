@@ -19,7 +19,7 @@ figRoi=1;
 toSavePdf = 0;
 imgFormat = 'jpg';
 %subjects = [1:8];
-subjects = [1:4];
+subjects = [1:8];
 
 ifig=0;
 %nrois = 4;
@@ -69,55 +69,47 @@ edgeAlpha = 0.3;%0.07
 markerColor = [0 0 0];
 prfThresh = 0;
 
-prffolder = ['/bwdata/NSDData/Seohee/Orientation/prfsample/'];
+prffolder_photoSP = '/bwdata/NSDData/Seohee/Orientation/prfsample/';
+prffolder_ldSP = '/bwdata/NSDData/Seohee/Orientation/prfsample_Ori_control/';
+prffolder_contour = '/bwdata/NSDData/Seohee/Orientation/prfsample_Ori/';
+folder_list= {prffolder_photoSP, prffolder_ldSP, prffolder_contour};
 figFolder = ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/figures/'];
 
-allOri = cell(1,nrois);
-allLevVig = cell(1,nrois);
-allLevFull = cell(1,nrois);
-allPrfR2 = cell(1,nrois);
-allNsdCorr = cell(1,nrois);
-allNsdOriCorr = cell(1,nrois);
-allSynthCorr = cell(1,nrois);
-allSynthOriCorr = cell(1,nrois);
-allPrfX = cell(1,nrois);
-allPrfY = cell(1,nrois);
-allPrfEcc = cell(1,nrois);
-allPrfAng = cell(1,nrois);
-allSynthOri = cell(1,nrois);
-allSynthLevVig = cell(1,nrois);
-allSynthLevFull = cell(1,nrois);
-allImprovCorr = cell(1,nrois);
-allNsdOriR2 = cell(1,nrois);
-allNsdR2 = cell(1,nrois);
+allOri = cell(3,nrois);
+allLevFull = cell(3,nrois);
+allPrfR2 = cell(3,nrois);
+allNsdOriCorr = cell(3,nrois);
+allPrfX = cell(3,nrois);
+allPrfY = cell(3,nrois);
+allPrfEcc = cell(3,nrois);
+allPrfAng = cell(3,nrois);
+allNsdOriR2 = cell(3,nrois);
 
-for isub=1:length(subjects)
-    subnum = subjects(isub);
-    load([prffolder 'voxModelPref_sub' num2str(isub) '.mat'],'allRoiPrf','roiLevVig','roiLevFull',...
-        'roiOri','roiNsdCorr','roiNsdOriCorr','roiNsdOriR2','roiNsdR2',...
-        'visRoiData','roiNames','combinedRoiNames','roiInd','prefAnalysis');
-    subAnalysis(isub) = prefAnalysis;
-%     subNsdSynthImprov_corr(isub,:,:) = nsdSynthImprov_corr;
-%     subNsdSynthImprov_pval(isub,:,:) = nsdSynthImprov_pval;
-    for iroi=1:nrois
-        allPrfX{iroi} = [allPrfX{iroi}; allRoiPrf{iroi}.x];
-        allPrfY{iroi} = [allPrfY{iroi}; allRoiPrf{iroi}.y];
-        allPrfEcc{iroi} = [allPrfEcc{iroi}; allRoiPrf{iroi}.ecc];
-        allPrfAng{iroi} = [allPrfAng{iroi}; allRoiPrf{iroi}.ang];
-        allPrfR2{iroi} = [allPrfR2{iroi}; allRoiPrf{iroi}.r2];
-        allOri{iroi} =  [allOri{iroi} roiOri{iroi}];
-        allLevVig{iroi} = [allLevVig{iroi} roiLevVig{iroi}];
-        allLevFull{iroi} = [allLevFull{iroi} roiLevFull{iroi}];
-        allNsdCorr{iroi} = [allNsdCorr{iroi} roiNsdCorr{iroi}];
-        allNsdOriCorr{iroi} = [allNsdOriCorr{iroi} roiNsdOriCorr{iroi}];
-        allNsdOriR2{iroi} = [allNsdOriR2{iroi} roiNsdOriR2{iroi}];
-        allNsdR2{iroi} = [allNsdR2{iroi} roiNsdR2{iroi}];
-%         allSynthCorr{iroi} = [allSynthCorr{iroi} roiSynthCorr{iroi}];
-%         allSynthOriCorr{iroi} = [allSynthOriCorr{iroi} roiSynthOriCorr{iroi}];
-%         allSynthOri{iroi} = [allSynthOri{iroi}; roiSynthOri{iroi}'];
-%         allSynthLevVig{iroi} = [allSynthLevVig{iroi} roiSynthLevVig{iroi}'];
-%         allSynthLevFull{iroi} = [allSynthLevFull{iroi} roiSynthLevFull{iroi}'];
-%         allImprovCorr{iroi} = [allImprovCorr{iroi} roiOriDeviation{iroi}];
+for method = 1:3
+    for isub=1:length(subjects)
+        subnum = subjects(isub);
+        load([folder_list{method} 'voxModelPref_sub' num2str(isub) '.mat'],'allRoiPrf','roiLevFull',...
+            'roiOri','roiNsdOriCorr','roiNsdOriR2',...
+            'visRoiData','roiNames','combinedRoiNames','roiInd','prefAnalysis');
+        subAnalysis(isub) = prefAnalysis;
+        %     subNsdSynthImprov_corr(isub,:,:) = nsdSynthImprov_corr;
+        %     subNsdSynthImprov_pval(isub,:,:) = nsdSynthImprov_pval;
+        for iroi=1:nrois
+            allPrfX{method, iroi} = [allPrfX{method, iroi}; allRoiPrf{iroi}.x];
+            allPrfY{method, iroi} = [allPrfY{method, iroi}; allRoiPrf{iroi}.y];
+            allPrfEcc{method, iroi} = [allPrfEcc{method, iroi}; allRoiPrf{iroi}.ecc];
+            allPrfAng{method, iroi} = [allPrfAng{method, iroi}; allRoiPrf{iroi}.ang];
+            allPrfR2{method, iroi} = [allPrfR2{method, iroi}; allRoiPrf{iroi}.r2];
+            allOri{method, iroi} =  [allOri{method, iroi} roiOri{iroi}];
+            allNsdOriCorr{method, iroi} = [allNsdOriCorr{method, iroi} roiNsdOriCorr{iroi}];
+            allNsdOriR2{method, iroi} = [allNsdOriR2{method, iroi} roiNsdOriR2{iroi}];
+            %         allSynthCorr{iroi} = [allSynthCorr{iroi} roiSynthCorr{iroi}];
+            %         allSynthOriCorr{iroi} = [allSynthOriCorr{iroi} roiSynthOriCorr{iroi}];
+            %         allSynthOri{iroi} = [allSynthOri{iroi}; roiSynthOri{iroi}'];
+            %         allSynthLevVig{iroi} = [allSynthLevVig{iroi} roiSynthLevVig{iroi}'];
+            %         allSynthLevFull{iroi} = [allSynthLevFull{iroi} roiSynthLevFull{iroi}'];
+            %         allImprovCorr{iroi} = [allImprovCorr{iroi} roiOriDeviation{iroi}];
+        end
     end
 end
 
@@ -136,7 +128,7 @@ linewidth=2;
 %histogram of R2 for full and constrained
 isubplot=isubplot+1; subplot(rows,cols,isubplot);
 histogram(allNsdR2{iroi}(isplit,:),nhistbins,'faceColor',constColor,'faceAlpha',histAlpha,'Normalization','probability'); hold on;
-histogram(allNsdOriR2{iroi}(isplit,:),nhistbins,'faceColor',fullColor,'faceAlpha',histAlpha,'Normalization','probability'); hold on;
+histogram(allNsdOriR2{methodiroi}(isplit,:),nhistbins,'faceColor',fullColor,'faceAlpha',histAlpha,'Normalization','probability'); hold on;
 xlabel('\itR^2');
 ylabel('\itproportion of voxels');
 legend('\itconstrained','\itfull');

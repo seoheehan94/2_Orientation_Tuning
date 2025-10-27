@@ -1,32 +1,30 @@
-%analyze_orientation.m
-% get voxel preference from model weights and create brainVolume
+% saveAnalysisFiles.m
+% save R2/AIC/BIC and create brainVolumes
 %   uses files created by: regressPrfSplit.m
-%   creates files used by:
+%   crsaveeates files used by:
+
 clear all;
-savefolder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/brainVolume_regress';
+savefolder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/brainVolume';
 roiNames = {'V1v','V1d','V2v','V2d','V3v','V3d','hV4'};
 combinedRoiNames = {'V1','V2','V3','hV4'};
-conditions = {'old', 'ori', 'control'};
-prffolders = {'prfsample', 'prfsample_Ori', 'prfsample_Ori_control'};
+condition = {'photoSP', 'ldSP', 'contour'}; 
 
-
-%% 1.  mean R2, AIC, BIC %%
+%% 1.  get R2, AIC, BIC %%
 totalR2OriSplit = struct;
 totalaicOriSplit = struct;
 totalbicOriSplit = struct;
-for con = [1,3]
-    totalR2OriSplit.(conditions{con}) = {};
-    totalaicOriSplit.(conditions{con}) = {};
-    totalbicOriSplit.(conditions{con}) = {};
+for con = [1, 2, 3]
+    totalR2OriSplit.(condition{con}) = {};
+    totalaicOriSplit.(condition{con}) = {};
+    totalbicOriSplit.(condition{con}) = {};
     for isub = 1:8
-        curPrf = ['/bwdata/NSDData/Seohee/Orientation/', prffolders{con}, '/'];
+        curPrf = ['/bwdata/NSDData/Seohee/Orientation/prfsample_', condition{con}, '/'];
         fprintf('isub:%d. con:%d. ...\n',isub,con);
-        load([curPrf 'voxModelPref_sfmean_regress_sub' num2str(isub) '.mat']);
-
+        load([curPrf 'voxModelPref_sub' num2str(isub) '.mat']);
         %% total values of R2, aic, bic
-        totalR2OriSplit.(conditions{con}){end+1} = roiNsdOriR2;
-        totalaicOriSplit.(conditions{con}){end+1} = allaicOriSplit;
-        totalbicOriSplit.(conditions{con}){end+1} = allbicOriSplit;
+        totalR2OriSplit.(condition{con}){end+1} = roiNsdOriR2;
+        totalaicOriSplit.(condition{con}){end+1} = allaicOriSplit;
+        totalbicOriSplit.(condition{con}){end+1} = allbicOriSplit;
 
     end
 end
@@ -52,14 +50,16 @@ for i = 1:numel(fieldsCon)
         curV3R2OriSplit = [curV3R2OriSplit, totalR2OriSplit.(fieldsCon{i}){j}{3}(3,:)];
         curV4R2OriSplit = [curV4R2OriSplit, totalR2OriSplit.(fieldsCon{i}){j}{4}(3,:)];
     end
-    % writematrix(curRoiR2OriSplit', ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/allroiR2_sfmean', '_', (fieldsCon{i}), '.csv']);
-    writematrix(curV1R2OriSplit', ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/V1R2', imgType{curimgtype}, '_', (fieldsCon{i}), '.csv']);
+    writematrix(curRoiR2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/allroiR2_', '_', (fieldsCon{i}), '.csv']);
+    writematrix(curV1R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V1R2', (fieldsCon{i}), '.csv']);
+    writematrix(curV2R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V2R2', (fieldsCon{i}), '.csv']);
+    writematrix(curV3R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V3R2', (fieldsCon{i}), '.csv']);
+    writematrix(curV4R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V4R2', (fieldsCon{i}), '.csv']);
 
     allroiR2OriSplit(i) = mean(curRoiR2OriSplit, 'omitnan');
     V1R2OriSplit(i) = mean(curV1R2OriSplit,'omitnan');
 end
 
-% save(fullfile(['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/MaxMinPatch/', 'meanR2.mat']), "allroiR2OriSplit", "V1R2OriSplit");
 
 
 %% AIC/BIC
@@ -78,9 +78,7 @@ for i = 1:numel(fieldsCon)
         curV1aicOriSplit = [curV1aicOriSplit, totalaicOriSplit.(fieldsCon{i}){j}{1}(3,:)];
         curV1bicOriSplit = [curV1bicOriSplit, totalbicOriSplit.(fieldsCon{i}){j}{1}(3,:)];
     end
-    % writematrix(curRoiaicOriSplit, ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/MaxMin/allroiR2', imgType{curimgtype}, '_', (fieldsCon{i}), '.csv']);
-    % writematrix(curRoiaicOriSplit, ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/analyses/MaxMin/V1R2', imgType{curimgtype}, '_', (fieldsCon{i}), '.csv']);
-
+    
     allroiaicOriSplit(i) = mean(curRoiaicOriSplit,"omitnan");
     V1aicOriSplit(i) = mean(curV1aicOriSplit,"omitnan");
     allroibicOriSplit(i) = mean(curRoibicOriSplit,"omitnan");
@@ -90,12 +88,12 @@ end
 
 %% make a brain volume
 
-for con = [1,3]
+for con = [1,2,3]
 
     for isub = 1:8
-        curPrf = ['/bwdata/NSDData/Seohee/Orientation/', prffolders{con}, '/'];
+        curPrf = ['/bwdata/NSDData/Seohee/Orientation/prfsample_', condition{con}, '/'];
         fprintf('isub:%d. con:%d. ...\n',isub,con);
-        load([curPrf 'voxModelPref_sfmean_regress_sub' num2str(isub) '.mat']);
+        load([curPrf 'voxModelPref_sub' num2str(isub) '.mat']);
 
         % save all ROIs to create overlay
         roifolder = ['/bwdata/NSDData/nsddata/ppdata/subj0' num2str(isub) '/func1pt8mm/'];
@@ -176,8 +174,8 @@ for con = [1,3]
         % load(['oriBrain_sub', num2str(isub), '.mat']);
         info_old = niftiinfo(['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/brainVolume/betas_session01_sub', num2str(isub),'.nii.gz']);
 
-        niftiwrite(newBrain,[savefolder, '/', conditions{con}, 'Brain_sfmean_sub', num2str(isub),'.nii']);
-        info_new = niftiinfo([savefolder, '/', conditions{con}, 'Brain_sfmean_sub', num2str(isub),'.nii']);
+        niftiwrite(newBrain,[savefolder, '/', condition{con}, 'Brain_sub', num2str(isub),'.nii']);
+        info_new = niftiinfo([savefolder, '/', condition{con}, 'Brain_sub', num2str(isub),'.nii']);
         info_new.PixelDimensions = [1.8, 1.8, 1.8];
         info_new.TransformName = info_old.TransformName;
         info_new.SpatialDimension = info_old.SpatialDimension;
@@ -190,7 +188,7 @@ for con = [1,3]
         info_new.raw.srow_x = info_old.raw.srow_x;
         info_new.raw.srow_y = info_old.raw.srow_y;
         info_new.raw.srow_z = info_old.raw.srow_z;
-        niftiwrite(newBrain,[savefolder, '/', conditions{con}, 'Brain_sfmean_sub', num2str(isub),'.nii'], info_new);
+        niftiwrite(newBrain,[savefolder, '/', condition{con}, 'Brain_sub', num2str(isub),'.nii'], info_new);
 
         % niftiwrite(newBrainbyROI,[savefolder, '/', condition{con}, 'BrainbyROI_sub', num2str(isub),'.nii']);
         % info_new = niftiinfo([savefolder, '/', condition{con}, 'BrainbyROI_sub', num2str(isub),'.nii']);
@@ -209,8 +207,8 @@ for con = [1,3]
         % niftiwrite(newBrainbyROI,[savefolder, '/', condition{con}, 'BrainbyROI_sub', num2str(isub),'.nii'],info_new);
 
 
-        niftiwrite(r2Brain,[savefolder, '/', conditions{con}, 'BrainR2_sfmean_sub', num2str(isub),'.nii']);
-        info_new = niftiinfo([savefolder, '/', conditions{con}, 'BrainR2_sfmean_sub', num2str(isub),'.nii']);
+        niftiwrite(r2Brain,[savefolder, '/', condition{con}, 'BrainR2_sub', num2str(isub),'.nii']);
+        info_new = niftiinfo([savefolder, '/', condition{con}, 'BrainR2_sub', num2str(isub),'.nii']);
         info_new.PixelDimensions = [1.8, 1.8, 1.8];
         info_new.TransformName = info_old.TransformName;
         info_new.SpatialDimension = info_old.SpatialDimension;
@@ -223,7 +221,7 @@ for con = [1,3]
         info_new.raw.srow_x = info_old.raw.srow_x;
         info_new.raw.srow_y = info_old.raw.srow_y;
         info_new.raw.srow_z = info_old.raw.srow_z;
-        niftiwrite(r2Brain,[savefolder, '/', conditions{con}, 'BrainR2_sfmean_sub', num2str(isub),'.nii'],info_new);
+        niftiwrite(r2Brain,[savefolder, '/', condition{con}, 'BrainR2_sub', num2str(isub),'.nii'],info_new);
 
 
 

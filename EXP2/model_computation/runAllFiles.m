@@ -1,42 +1,60 @@
 %% prfSampleModel
 
-% addpath(genpath('/home/hanseohe/Documents/GitHub/stimulusVignetting'))
-% for sub = 7:8
-%     fprintf('%s. %d. %d ...\n','prfSampleModel',sub,1);
-%     prfSampleModel(sub,1);
-%     fprintf('%s. %d. %d ...\n','prfSampleModel',sub,2);
-%     prfSampleModel(sub,2);
-%     fprintf('%s. %d. %d ...\n','prfSampleModel',sub,3);
-%     prfSampleModel(sub,3);
-%     fprintf('%s. %d. %d ...\n','prfSampleModel',sub,4);
-%     prfSampleModel(sub,4);
-% end
+addpath(genpath('/home/hanseohe/Documents/GitHub/3rdParty/stimulusVignetting'))
+
+for sub = 1:8
+    for region = 1:4
+        fprintf('%s. %d. %d ...\n','prfSampleModel_photoSP',sub,region);
+        prfSampleModel_photoSP(sub,region);
+    end
+end
+
+for sub = 1:8
+    for region = 1:4
+        fprintf('%s. %d. %d ...\n','prfSampleModel_ldSP',sub,region);
+        prfSampleModel_ldSP(sub,region);
+   
+    end
+end
+for sub = 1:8
+    for region = 1:4
+        fprintf('%s. %d. %d ...\n','prfSampleModel_contour',sub,region);
+        prfSampleModel_contour(sub,region);
+    end
+end
 
 %% regressPrfSplit
-% for sub = 1:8
-% fprintf('%s. %d. %d ...\n','regressPrfSplit',sub, 1);
-% regressPrfSplit(sub, 1);
-% fprintf('%s. %d. %d ...\n','regressPrfSplit',sub, 2);
-% regressPrfSplit(sub, 2);
-% fprintf('%s. %d. %d ...\n','regressPrfSplit',sub, 3);
-% regressPrfSplit(sub, 3);
-% fprintf('%s. %d. %d ...\n','regressPrfSplit',sub, 4);
-% regressPrfSplit(sub, 4);
-% end
-% % 
-% for sub = 1:8
-% fprintf('%s. %d. %d ...\n','regressPrfSplit',sub, 1);
-% regressPrfSplit_control(sub, 1);
-% fprintf('%s. %d. %d ...\n','regressPrfSplit',sub, 2);
-% regressPrfSplit_control(sub, 2);
-% fprintf('%s. %d. %d ...\n','regressPrfSplit',sub, 3);
-% regressPrfSplit_control(sub, 3);
-% fprintf('%s. %d. %d ...\n','regressPrfSplit',sub, 4);
-% regressPrfSplit_control(sub, 4);
-% end
+for sub = 1:8
+    for region = 1:4
+        fprintf('%s. %d. %d ...\n','regressPrfSplit_photoSP',sub, region);
+        regressPrfSplit_photoSP(sub, region);
+    end
+end
+
+for sub = 1:8
+    for region = 1:4
+        fprintf('%s. %d. %d ...\n','regressPrfSplit_ldSP',sub, region);
+        regressPrfSplit_ldSP(sub, region);
+    end
+end
+
+for sub = 1:8
+    for region = 1:4
+        fprintf('%s. %d. %d ...\n','regressPrfSplit_contour',sub, region);
+        regressPrfSplit_contour(sub, region);
+    end
+end
 
 %% getVoxPref
 for sub = 1:8
-    fprintf('%s. %d. %d ...\n','getVoxPref_regress',sub, 1);
-    getVoxPref_regress(sub,4, 1);
+    fprintf('%s. %d. %d ...\n','getVoxPref_photoSP',sub, 1);
+    getVoxPref(sub,4, 1);
+end
+for sub = 1:8
+    fprintf('%s. %d. %d ...\n','getVoxPref_ldSP',sub, 2);
+    getVoxPref(sub,4, 2);
+end
+for sub = 1:8
+    fprintf('%s. %d. %d ...\n','getVoxPref_contour',sub, 3);
+    getVoxPref(sub,4, 3);
 end

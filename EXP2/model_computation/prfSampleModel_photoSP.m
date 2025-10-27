@@ -1,4 +1,4 @@
-% prfSampleModel.m
+% prfSampleModel_photoSP.m
 %
 % associated with the following publication: Roth, ZN, Kay, K, and Merriam, EP (2022).
 % Massive natural scene sampling reveals reliable coarse-scale orientation tuning in human V1
@@ -7,12 +7,12 @@
 %   usage: prfSampleModel(1,1)
 %   by: zvi roth
 %   date: 7/29/2022
-%   purpose: use voxel pRFs to sample model energy outputs for natural
+%   purpose: use voxel pRFs to sample model response outputs for natural
 %   images stimuli
 %   uses files created by: nsdStim.m
 %   creates files used by: regressPrfSplit.m
 
-function prfSampleModel_control(isub,visualRegion)
+function prfSampleModel_photoSP(isub,visualRegion)
 % addpath(genpath('/home/hanseohe/Documents/GitHub/stimulusVignetting'))
 delete(gcp('nocreate'));
 g=gcp
@@ -54,7 +54,7 @@ x = -(backgroundSize*imgScaling)/2+0.5:(backgroundSize*imgScaling)/2-0.5;
 y = -(backgroundSize*imgScaling)/2+0.5:(backgroundSize*imgScaling)/2-0.5;
 [X,Y] = meshgrid(x,-y);%flip up-down
 
-pyramidfolder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/stimuli/pyramid_LD/';%to save model outputs
+pyramidfolder = '/bwdata/NSDData/Seohee/stimuli/pyramid/';%to save model outputs
 betasfolder = ['/bwdata/NSDData/nsddata/ppdata/subj0' num2str(isub) '/func1pt8mm/'];
 angFile = fullfile(betasfolder,'prf_angle.nii.gz');
 eccFile = fullfile(betasfolder,'prf_eccentricity.nii.gz');
@@ -141,12 +141,12 @@ for roinum=1:length(rois)
     prfSampleLevOri{roinum} = prfSampleLevOriRoi;
 end
 
-prffolder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/prfsample_Ori_control/';
+prffolder = '/bwdata/NSDData/Seohee/Orientation/prfsample_photoSP/';
 save(fullfile(prffolder,['prfSampleStim_v' num2str(visualRegion) '_sub' num2str(isub) '.mat']),'prfSampleLevOri','prfSampleLev',...
     'rois','allImgs','numLevels','numOrientations','interpImgSize','backgroundSize','pixPerDeg',...
     'roiPrf','-v7.3');
 delete(g);
-toc;
+
 %% CSS pRF from Kay et al., J Neurophysiology, 2013
     function r = prfResp(S,x,y,x0,y0,sigma, n, g)
         G = exp(-((x-x0).^2+(y-y0).^2)/(2*sigma^2));

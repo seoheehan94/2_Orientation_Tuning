@@ -1,5 +1,5 @@
 
-% regressPrfSplit_new.m
+% regressPrfSplit_contour.m
 %
 % associated with the following publication: Roth, ZN, Kay, K, and Merriam, EP (2022).
 % Massive natural scene sampling reveals reliable coarse-scale orientation tuning in human V1
@@ -8,11 +8,11 @@
 %   usage: regressPrfSplit(1,1)
 %   by: zvi roth
 %   date: 7/29/2022
-%   purpose: Perform linear regression on the response amplitudes for each voxel with filter output values as predictors
-%   uses files created by: prfSampleModel.m, prfSampleModel_synth.m
+%   purpose: Perform linear regression on the response amplitudes for each voxel with orientation response output values as predictors
+%   uses files created by: prfSampleModel.m
 %   creates files used by: getVoxPref.m
 
-function regressPrfSplit_new(isub,visualRegions)
+function regressPrfSplit_contour(isub,visualRegions)
 
 tic
 
@@ -22,7 +22,7 @@ nsessions=nsessionsSub(isub);
 nsplits=2;
 bandpass = 1; bandMin = 1; bandMax = 1;
 
-boxfolder = '/bwdata/NSDData/Seohee/Orientation/prfsample_Ori/';
+boxfolder = '/bwdata/NSDData/Seohee/Orientation/prfsample_contour/';
 betasfolder = ['/bwdata/NSDData/nsddata_betas/ppdata/subj0' num2str(isub) '/func1pt8mm/betas_fithrf_GLMdenoise_RR/'];
 % stimfilename = fullfile(folder,'nsdsynthetic_colorstimuli_subj01.hdf5');
 nsdfolder = '/bwdata/NSDData/nsddata/experiments/nsd/';
@@ -321,9 +321,9 @@ for visualRegion=visualRegions
     
     %% SAVE RESULTS
     bandpassStr = ['_bandpass' num2str(bandMin) 'to' num2str(bandMax)];
-    % save(fullfile(boxfolder,['regressPrfSplit' bandpassStr '_v' num2str(visualRegion) '_sub' num2str(isub) '.mat']), ...
-        % 'nsd',...
-        % 'numLevels', 'numOrientations','rois','nvox','roiPrf','nsplits');
+    save(fullfile(boxfolder,['regressPrfSplit' bandpassStr '_v' num2str(visualRegion) '_sub' num2str(isub) '.mat']), ...
+        'nsd',...
+        'numLevels', 'numOrientations','rois','nvox','roiPrf','nsplits');
     toc
 end
 

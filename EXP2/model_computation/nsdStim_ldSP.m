@@ -7,7 +7,7 @@
 %   usage: nsdStim()
 %   by: zvi roth
 %   date: 7/29/2022
-%   purpose: run natural scene stimuli through the models, get filter energy responses,
+%   purpose: run natural scene stimuli through the models, get  energy responses,
 %   and save output
 %   creates files used by: prfSampleModel.m
 
@@ -22,7 +22,7 @@ backgroundSize = 1024;
 imgScaling = 0.5;
 
 %pyramidfolder = '/misc/data18/rothzn/nsd/stimuli/pyramid/';%to save model outputs
-pyramidfolder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/stimuli/pyramid/';%to save model outputs
+pyramidfolder = '/bwdata/NSDData/Seohee/stimuli/pyramid_LD/';%to save model outputs
 
 %%
 % construct quad frequency filters
@@ -34,7 +34,7 @@ numLevels = maxLevel(dims,bandwidth);
 [freqRespsImag, freqRespsReal, pind] = makeQuadFRs(dims, numLevels, numOrientations, bandwidth);
 
 %%
-stimfolder = '/bwdata/NSDData/stimuli/';
+stimfolder = '/bwdata/NSDData/stmuli/';
 stimfilename = fullfile(stimfolder,'nsd_stimuli.hdf5');%[3 1360 714 220]
 stiminfo = h5info(stimfilename);
 
@@ -48,7 +48,7 @@ nsdDesign = load(nsdDesignFilename);
 allImgs = nsdDesign.sharedix; %indices of the shared 1000 images
 
 
-for isub=[1:8]
+for isub=[2:8]
     
     
     allImgs = nsdDesign.subjectim(isub,nsdDesign.masterordering);%indices of all 10000 images used for this subject
@@ -56,45 +56,64 @@ for isub=[1:8]
     %%
     backgroundColor(1,1,:) = uint8([127,127,127]);
     
+    
     nImgs = 1;
     
     fixPoint(1,1,:) = [255 0 0];
     
     iimg=0;
     for imgNum=allImgs
-        iimg = iimg+1;
+        iimg = iimg+1
         
         pyramidfilename = ['pyrImg' num2str(imgNum) '.mat'];
         if ~isfile(fullfile(pyramidfolder, pyramidfilename))%if file exists already no need to remake it
-            fprintf('%s....\n',pyramidfilename);
-            origImg = h5read(stimfilename,'/imgBrick/',[1 1 1 imgNum],[3 imgSizeX imgSizeY nImgs]);
-            
-            origImg = double(origImg);
-            origImg = permute(origImg,[3 2 1]);%[425,425,3]
-            
-            [Xq, Yq] = meshgrid(linspace(1,imgSizeX, interpImgSize), linspace(1,imgSizeY, interpImgSize));
-            for irgb=1:3
-                interpImg(:,:,irgb) = interp2(squeeze(origImg(:,:,irgb)), Xq, Yq);
+            % origImg = h5read(stimfilename,'/imgBrick/',[1 1 1 imgNum],[3 imgSizeX imgSizeY nImgs]);
+            % origImg = double(origImg);
+            % origImg = permute(origImg,[3 2 1]);%[425,425,3]
+            imgName = ['img' num2str(imgNum) '.mat'];
+            if imgNum <= 14600*1
+                imgFolder = '/bwlab/Users/SeoheeHan/NSDData/nsddata_stimuli/images01/';
+            elseif imgNum <= 14600*2
+                imgFolder = '/bwlab/Users/SeoheeHan/NSDData/nsddata_stimuli/images02/';
+            elseif imgNum <= 14600*3
+                imgFolder = '/bwlab/Users/SeoheeHan/NSDData/nsddata_stimuli/images03/';
+            elseif imgNum <= 14600*4
+                imgFolder = '/bwlab/Users/SeoheeHan/NSDData/nsddata_stimuli/images04/';
+            elseif imgNum <= 14600*5
+                imgFolder = '/bwlab/Users/SeoheeHan/NSDData/nsddata_stimuli/images05/';
             end
+            load(fullfile(imgFolder, imgName));
+
+            imgLD = renderLinedrawing(vecLD,[],[357,357]);
+            imgLD = rgb2gray((1-imgLD))*255;
+            bigImg = zeros(512);
+            offset = round((size(bigImg,1)-size(imgLD,1))/2);
+            bigImg(offset+[1:size(imgLD,1)],offset+[1:size(imgLD,2)]) = imgLD;
+
+
+            % [Xq, Yq] = meshgrid(linspace(1,imgSizeX, interpImgSize), linspace(1,imgSizeY, interpImgSize));
+            % for irgb=1:3
+            %     interpImg(:,:,irgb) = interp2(squeeze(origImg(:,:,irgb)), Xq, Yq);
+            % end
             %add red semi-transparent fixation point
             
-            interpImg(interpImgSize/2-8:interpImgSize/2+8,interpImgSize/2-8:interpImgSize/2+8,:) = ...
-                (interpImg(interpImgSize/2-8:interpImgSize/2+8,interpImgSize/2-8:interpImgSize/2+8,:) + ...
-                repmat(fixPoint,17,17,1))/2;
-            
+            % interpImg(interpImgSize/2-8:interpImgSize/2+8,interpImgSize/2-8:interpImgSize/2+8,:) = ...
+            %     (interpImg(interpImgSize/2-8:interpImgSize/2+8,interpImgSize/2-8:interpImgSize/2+8,:) + ...
+            %     repmat(fixPoint,17,17,1))/2;
+            % 
             %%add background
-            bigImg = repmat(backgroundColor,backgroundSize,backgroundSize,1);
-            bigImg(1+backgroundSize/2-interpImgSize/2 : backgroundSize/2+interpImgSize/2, 1+backgroundSize/2-interpImgSize/2 : backgroundSize/2+interpImgSize/2,:) = interpImg(:,:,:);
-            
-            %axis image
-            % colormap gray
-            
-            %change to grayscale
-            % for now, simply by averaging across RGB channels
-            bigImg = mean(bigImg,3);
-            
-            %DOWNSAMPLE
-            bigImg = imresize(bigImg,imgScaling);
+            % bigImg = repmat(backgroundColor,backgroundSize,backgroundSize,1);
+            % bigImg(1+backgroundSize/2-interpImgSize/2 : backgroundSize/2+interpImgSize/2, 1+backgroundSize/2-interpImgSize/2 : backgroundSize/2+interpImgSize/2,:) = interpImg(:,:,:);
+            % 
+            % %axis image
+            % % colormap gray
+            % 
+            % %change to grayscale
+            % % for now, simply by averaging across RGB channels
+            % bigImg = mean(bigImg,3);
+            % 
+            % %DOWNSAMPLE
+            % bigImg = imresize(bigImg,imgScaling);
             %% pass image through steerable pyramid
             
             [pyr, pind] = buildQuadBands(bigImg, freqRespsImag, freqRespsReal);
@@ -107,7 +126,6 @@ for isub=[1:8]
                 modelOri{ilev} = zeros(numOrientations, dims(1), dims(2));
                 for orientation = 1:numOrientations
                     thisBand = abs(accessSteerBand(pyr, pind, numOrientations,ilev, orientation)).^2;
-                    keyboard;
                     sumOri{ilev}(:,:) = sumOri{ilev}(:,:) + thisBand;
                     modelOri{ilev}(orientation,:,:) = thisBand;
                 end

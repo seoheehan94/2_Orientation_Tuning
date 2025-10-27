@@ -1,17 +1,12 @@
 % nsdStim.m
 %
-% associated with the following publication: Roth, ZN, Kay, K, and Merriam, EP (2022).
-% Massive natural scene sampling reveals reliable coarse-scale orientation tuning in human V1
-% DOI:
+% 
 %
 %   usage: nsdStim()
-%   by: zvi roth
-%   date: 7/29/2022
-%   purpose: run natural scene stimuli through the models, get filter energy responses,
+%   purpose: run natural scene stimuli through the models, get energy responses,
 %   and save output
 %   creates files used by: prfSampleModel.m
 
-% uses the steerable pyramid: https://github.com/elimerriam/stimulusVignetting
 
 close all;
 clear all;
@@ -21,7 +16,7 @@ renderSize = [357,357];
 
 cd '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/stimuli';
 %pyramidfolder = '/misc/data18/rothzn/nsd/stimuli/pyramid/';%to save model outputs
-orifolder = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/stimuli/orientationfilter/';%to save model outputs
+orifolder = '/bwdata/NSDData/Seohee/stimuli/contour/';%to save model outputs
 
 %%
 % construct quad frequency filters

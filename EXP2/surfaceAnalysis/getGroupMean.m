@@ -4,10 +4,9 @@
 clear all;
 
 filedir = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/surfaceData/';
-condition = {'old', 'control','ori'};
-
+condition = {'photoSP', 'ldSP', 'contour'}; 
 addpath(genpath('/usr/local/freesurfer/7.4.1/matlab'));
-[~,M,mr] = load_mgh('/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/surfaceData/sub1/oldBrain_sfmean_sub1_lh_fsaverage.mgh');
+[~,M,mr] = load_mgh('/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/surfaceData/sub1/photoSPBrain_sub1_lh_fsaverage.mgh');
 
 % 50 percet cutoff for old R2 (participant averaged)
 cutoff_lh = 0.014;
@@ -21,8 +20,8 @@ for c = 1:3
     %% get all subjects volume in radians
     % what to do with -1 and 0?
     for isub=1:8
-        vol_lh(:,isub) = load_mgh([filedir, 'sub', num2str(isub), '/', condition{curcond}, 'Brain_sfmean_sub', num2str(isub), '_lh_fsaverage.mgh']);
-        vol_rh(:,isub) = load_mgh([filedir, 'sub', num2str(isub), '/', condition{curcond}, 'Brain_sfmean_sub', num2str(isub), '_rh_fsaverage.mgh']);
+        vol_lh(:,isub) = load_mgh([filedir, 'sub', num2str(isub), '/', condition{curcond}, 'Brain_sub', num2str(isub), '_lh_fsaverage.mgh']);
+        vol_rh(:,isub) = load_mgh([filedir, 'sub', num2str(isub), '/', condition{curcond}, 'Brain_sub', num2str(isub), '_rh_fsaverage.mgh']);
     end
     
     % multiply by 2
@@ -34,8 +33,8 @@ for c = 1:3
     %% get all subjects full model R2 values
     % what to do with -1 and 0?
     for isub=1:8
-        R2_lh(:,isub) = load_mgh([filedir, 'sub', num2str(isub), '/', condition{curcond}, 'BrainR2_sfmean_sub', num2str(isub), '_lh_fsaverage.mgh']);
-        R2_rh(:,isub) = load_mgh([filedir, 'sub', num2str(isub), '/', condition{curcond}, 'BrainR2_sfmean_sub', num2str(isub), '_rh_fsaverage.mgh']);
+        R2_lh(:,isub) = load_mgh([filedir, 'sub', num2str(isub), '/', condition{curcond}, 'BrainR2_sub', num2str(isub), '_lh_fsaverage.mgh']);
+        R2_rh(:,isub) = load_mgh([filedir, 'sub', num2str(isub), '/', condition{curcond}, 'BrainR2_sub', num2str(isub), '_rh_fsaverage.mgh']);
     end
 
 
@@ -77,13 +76,13 @@ for c = 1:3
     % numVoxel_lh(curcond) = size(nonzeros(top50_prefAngle_lh),1);
     % numVoxel_rh(curcond) = size(nonzeros(top50_prefAngle_rh),1);
     %% save
-    fileName_lh = [filedir, condition{curcond}, 'Brain_sfmean_groupmean_lh_fsaverage2.mgh'];
-    fileName_rh = [filedir, condition{curcond}, 'Brain_sfmean_groupmean_rh_fsaverage2.mgh'];
+    fileName_lh = [filedir, condition{curcond}, 'Brain_groupmean_lh_fsaverage.mgh'];
+    fileName_rh = [filedir, condition{curcond}, 'Brain_groupmean_rh_fsaverage.mgh'];
     save_mgh(prefAngle_lh, fileName_lh, M,mr);
     save_mgh(prefAngle_rh, fileName_rh, M,mr);
 
-    fileName_lh = [filedir, condition{curcond}, 'Brain_sfmean_groupmean_top50_lh_fsaverage2.mgh'];
-    fileName_rh = [filedir, condition{curcond}, 'Brain_sfmean_groupmean_top50_rh_fsaverage2.mgh'];
+    fileName_lh = [filedir, condition{curcond}, 'Brain_groupmean_top50_lh_fsaverage.mgh'];
+    fileName_rh = [filedir, condition{curcond}, 'Brain_groupmean_top50_rh_fsaverage.mgh'];
     save_mgh(top50_prefAngle_lh, fileName_lh, M,mr);
     save_mgh(top50_prefAngle_rh, fileName_rh, M,mr);
 end
@@ -114,10 +113,10 @@ end
 clear all;
 
 filedir = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/surfaceData/';
-condition = {'old', 'control','ori'};
+condition = {'photoSP', 'ldSP', 'contour'}; 
 
 addpath(genpath('/usr/local/freesurfer/7.4.1/matlab'));
-[~,M,mr] = load_mgh('/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/surfaceData/sub1/oldBrain_sub1_lh_fsaverage.mgh');
+[~,M,mr] = load_mgh('/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/surfaceData/sub1/photoSPBrain_sub1_lh_fsaverage.mgh');
 
 for isub=1:8
     for curcond = 1:3
@@ -134,8 +133,8 @@ end
 meanR2diff_lh = mean(R2diff_lh,2, "omitnan");
 meanR2diff_rh = mean(R2diff_rh,2, "omitnan");
 
-fileName_lh = [filedir, 'R2diff_oriold_lh_fsaverage.mgh'];
-fileName_rh = [filedir, 'R2diff_oriold_rh_fsaverage.mgh'];
+fileName_lh = [filedir, 'R2diff_contour_photoSP_lh_fsaverage.mgh'];
+fileName_rh = [filedir, 'R2diff_contour_photoSP_rh_fsaverage.mgh'];
   
 % save_mgh(meanR2diff_lh, fileName_lh, M,mr);
 % save_mgh(meanR2diff_rh, fileName_rh, M,mr);
@@ -168,7 +167,7 @@ for visualregion = 1:4
 
         curmeanR2diff(isnan(overlay))=NaN;
 
-        fileName = [filedir, 'R2diff_oriold_', visualregions{visualregion}, '_', hemis{hemi}, '_fsaverage.mgh'];
+        fileName = [filedir, 'R2diff_contour_photoSP_', visualregions{visualregion}, '_', hemis{hemi}, '_fsaverage.mgh'];
         save_mgh(curmeanR2diff, fileName, M,mr);
 
     end
