@@ -31,7 +31,11 @@ Three models
    - regressPrfSplit.m: perform linear regression on the response amplitudes for each voxel with orientation response output values as predictors
    - getVoxProf.m: extract preferred orientation from regression weights for each voxel
    - runAllFiles.m: run prfSampleModel, regressPrfSplit, getVoxProf for all three models
+   - saveAnalysisFiles.m: save R2/AIC/BIC and create brainVolumes
  - R2_analysis: explained variance of neural data
  - surfaceAnalysis: surface mapping of neural data
+   - vol2surf.sh: convert volume to surface
+   - surf2surf.sh: convert subject surface to fsaverage surface
+   - getGroupMean.m: get the average of subjects
  - ori_histogram: orientation distribution in images 
 
