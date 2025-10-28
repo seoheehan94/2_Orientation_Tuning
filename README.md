@@ -32,6 +32,9 @@ Three models
    - getVoxProf.m: extract preferred orientation from regression weights for each voxel
    - runAllFiles.m: run prfSampleModel, regressPrfSplit, getVoxProf for all three models
    - saveAnalysisFiles.m: save R2/AIC/BIC and create brainVolumes
+   - fig_scatterplots.m: scatterplots of R2/prf R2/prf eccentricity for V1
+   - fig_preferredOri.m: Plot preferred orientations for V1
+   - fig_quantPlot.m: Quantitative plots of the deviation of preferred orientation from three idealized orientation preference maps
  - R2_analysis: explained variance of neural data
  - surfaceAnalysis: surface mapping of neural data
    - vol2surf.sh: convert volume to surface
