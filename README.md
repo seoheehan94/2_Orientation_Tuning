@@ -32,13 +32,19 @@ Three models
    - getVoxProf.m: extract preferred orientation from regression weights for each voxel
    - runAllFiles.m: run prfSampleModel, regressPrfSplit, getVoxProf for all three models
    - saveAnalysisFiles.m: save R2/AIC/BIC and create brainVolumes
+   - saveEccentricity.m: analyze, plot, and save R2 by eccentricity 
    - fig_scatterplots.m: scatterplots of R2/prf R2/prf eccentricity for V1
    - fig_preferredOri.m: Plot preferred orientations for V1
    - fig_quantPlot.m: Quantitative plots of the deviation of preferred orientation from three idealized orientation preference maps
+ - ori_histogram: orientation distribution in images 
  - R2_analysis: explained variance of neural data
  - surfaceAnalysis: surface mapping of neural data
-   - vol2surf.sh: convert volume to surface
-   - surf2surf.sh: convert subject surface to fsaverage surface
+   - vol2surf.sh: convert preferred orientation and R2 from volume to surface
+   - surf2surf.sh: convert preferred orientation and R2 from subject surface to fsaverage surface
    - getGroupMean.m: get the average of subjects
- - ori_histogram: orientation distribution in images 
+   - colorScale: colorScale for orientation preference in freeview
+   - vol2surf_prf.sh: convert prf_eccentricity from volume to surface
+   - surf2surf_prf.sh: convert prf_eccentricity from subject surface to fsaverage surface
+   - script_visualRegion: get visual regions
+ 
 
