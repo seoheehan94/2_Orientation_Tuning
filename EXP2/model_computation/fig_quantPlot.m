@@ -15,7 +15,7 @@ close all
 clear all
 tic
 
-condition =2; %1=old, 2=ori, 3=control
+condition =2; % condition = {'photoSP', 'ldSP', 'contour'}; 
 
 figRoi=1;
 pvalThresh = 0.025;
@@ -84,9 +84,9 @@ rBinBorders;
 if condition == 1
     baseColor = [133,149,225]/255;
 elseif condition == 2
-    baseColor = [225, 99, 116] / 255;
+    baseColor = [141,213,147]/255; 
 elseif condition == 3
-    baseColor = [141,213,147]/255;
+    baseColor = [225,99,116]/255;
 end
 
 % Variations of the base color
@@ -116,11 +116,11 @@ markerColor = [0 0 0];
 prfThresh = 0;
 
 if condition == 1
-    prffolder = ['/bwdata/NSDData/Seohee/Orientation/prfsample/'];
+    prffolder = ['/bwdata/NSDData/Seohee/Orientation/prfsample_photoSP/'];
 elseif condition == 2
-    prffolder = ['/bwdata/NSDData/Seohee/Orientation/prfsample_Ori/'];
+    prffolder = ['/bwdata/NSDData/Seohee/Orientation/prfsample_ldSP/'];
 elseif condition == 3
-    prffolder = ['/bwdata/NSDData/Seohee/Orientation/prfsample_Ori_control/'];
+    prffolder = ['/bwdata/NSDData/Seohee/Orientation/prfsample_contour/'];
 end
 figFolder = ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/figures/'];
 
@@ -148,7 +148,7 @@ allSubInd = cell(1,nrois);
 
 for isub=1:length(subjects)
     subnum = subjects(isub);
-    load([prffolder 'voxModelPref_regress_sub' num2str(isub) '.mat'],'allRoiPrf',...
+    load([prffolder 'voxModelPref_sub' num2str(isub) '.mat'],'allRoiPrf',...
         'roiOri','roiNsdOriR2',...
         'roiOriDeviation','roiVertDeviation','roiCardDeviation',...
         'visRoiData','roiNames','combinedRoiNames','roiInd','prefAnalysis','nsplits');
@@ -474,11 +474,11 @@ thetaticks(0:45:315); thetaticklabels({'0','','\pi/2','', '\pi','','3\pi/2',''})
 set(gcf,'position',[150 180 420 740]);
 
 if condition == 1
-    figName = 'quantMap_old2';
+    figName = 'quantMap_photoSP';
 elseif condition == 2
-    figName = 'quantMap_ori2';
+    figName = 'quantMap_ldSP';
 elseif condition == 3
-    figName = 'quantMap_control2';
+    figName = 'quantMap_contour';
 end
 
 if toSavePdf

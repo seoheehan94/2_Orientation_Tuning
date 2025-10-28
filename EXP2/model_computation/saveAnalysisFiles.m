@@ -50,11 +50,11 @@ for i = 1:numel(fieldsCon)
         curV3R2OriSplit = [curV3R2OriSplit, totalR2OriSplit.(fieldsCon{i}){j}{3}(3,:)];
         curV4R2OriSplit = [curV4R2OriSplit, totalR2OriSplit.(fieldsCon{i}){j}{4}(3,:)];
     end
-    writematrix(curRoiR2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/allroiR2_', '_', (fieldsCon{i}), '.csv']);
-    writematrix(curV1R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V1R2', (fieldsCon{i}), '.csv']);
-    writematrix(curV2R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V2R2', (fieldsCon{i}), '.csv']);
-    writematrix(curV3R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V3R2', (fieldsCon{i}), '.csv']);
-    writematrix(curV4R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V4R2', (fieldsCon{i}), '.csv']);
+    % writematrix(curRoiR2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/allroiR2_', '_', (fieldsCon{i}), '.csv']);
+    % writematrix(curV1R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V1R2', (fieldsCon{i}), '.csv']);
+    % writematrix(curV2R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V2R2', (fieldsCon{i}), '.csv']);
+    % writematrix(curV3R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V3R2', (fieldsCon{i}), '.csv']);
+    % writematrix(curV4R2OriSplit', ['/home/hanseohe/Documents/GitHub/2_Orientation_Tuning/EXP2/R2_analysis/V4R2', (fieldsCon{i}), '.csv']);
 
     allroiR2OriSplit(i) = mean(curRoiR2OriSplit, 'omitnan');
     V1R2OriSplit(i) = mean(curV1R2OriSplit,'omitnan');

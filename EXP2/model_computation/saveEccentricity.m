@@ -2,10 +2,10 @@
 clear all;
 
 filedir = '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/surfaceData/';
-condition = {'old', 'control','ori'};
+condition = {'photoSP', 'ldSP', 'contour'}; 
 
 % addpath(genpath('/usr/local/freesurfer/7.4.1/matlab'));
-[~,M,mr] = load_mgh('/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/surfaceData/sub1/oldBrain_sub1_lh_fsaverage.mgh');
+[~,M,mr] = load_mgh('/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/surfaceData/sub1/photoSPBrain_sub1_lh_fsaverage.mgh');
 
 
 %% bin eccentricity 
@@ -36,25 +36,7 @@ for isub=1:8
     binnedEcc_rh(:,isub) = ecc_rh;
 end
 
-    % %size
-    % size_lh = load_mgh([filedir, 'sub', num2str(isub), '/', 'prf_size_lh_fsaverage.mgh']);
-    % size_rh = load_mgh([filedir, 'sub', num2str(isub), '/', 'prf_size_rh_fsaverage.mgh']);
-    % 
-    % Allsize_lh(:,isub) = size_lh;
-    % Allsize_rh(:,isub) = size_rh;
-    % 
-    % edges = [8.4, 7, 6, 5, 4, 3, 2, 1, 0];
-    % values = [8, 7, 6, 5, 4, 3, 2, 1];
-    % size_lh(size_lh > 8.4) = 9;
-    % size_lh(size_lh == edges(1)) = 8;
-    % size_rh(size_rh > 8.4) = 9;
-    % size_rh(size_rh == edges(1)) = 8;
-    % 
-    % for i = 1:length(values)
-    %     size_lh(size_lh >= edges(i+1) & size_lh < edges(i)) = values(i);
-    %     size_rh(size_rh >= edges(i+1) & size_rh < edges(i)) = values(i);
-    % end  
- 
+   
 
 %% R2 by ecc
 R2_ecc_mean = zeros(3, 5); % Rows: conditions, Columns: eccentricity bins
@@ -85,11 +67,9 @@ for curcond = 1:3
 end
   
 
-%% save mean ecc, size as masks
+%% save mean ecc as masks
 meanecc_lh = mean(Allecc_lh,2, "omitnan");
 meanecc_rh = mean(Allecc_rh,2, "omitnan");
-% meansize_lh = mean(Allsize_lh,2, "omitnan");
-% meansize_rh = mean(Allsize_rh,2, "omitnan");
 
 edges = [4.2, 3, 2, 1, 0]; % Define edges in descending order
 values = [4, 3, 2, 1];     % Define corresponding values for the ranges
@@ -103,20 +83,6 @@ for i = 1:length(values)
     meanecc_rh(meanecc_rh >= edges(i+1) & meanecc_rh < edges(i)) = values(i);
 end
 
-
-% edges = [8.4, 7, 6, 5, 4, 3, 2, 1, 0];
-% values = [8, 7, 6, 5, 4, 3, 2, 1];
-% meansize_lh(meansize_lh > 8.4) = 9;
-% meansize_lh(meansize_lh == edges(1)) = 8;
-% meansize_rh(meansize_rh > 8.4) = 9;
-% meansize_rh(meansize_rh == edges(1)) = 8;
-% 
-%     for i = 1:length(values)
-%         meansize_lh(meansize_lh >= edges(i+1) & meansize_lh < edges(i)) = values(i);
-%         meansize_rh(meansize_rh >= edges(i+1) & meansize_rh < edges(i)) = values(i);
-%     end
-
-
 for i = 1:5
     % Eccentricity masks
     ecc_mask_lh = (meanecc_lh == i);
@@ -125,17 +91,6 @@ for i = 1:5
     save_label(filedir, ecc_mask_lh, ['ecc_level', num2str(i), '_lh.label']);
     save_label(filedir, ecc_mask_rh, ['ecc_level', num2str(i), '_rh.label']);
 end
-
-% for i = 1:9
-%     % Size masks
-%     size_mask_lh = (meansize_lh == i);
-%     size_mask_rh = (meansize_rh == i);
-% 
-%     % Save left hemisphere label
-%     save_label(filedir, size_mask_lh, ['size_level', num2str(i), '_lh.label']);
-%     % Save right hemisphere label
-%     save_label(filedir, size_mask_rh, ['size_level', num2str(i), '_rh.label']);
-% end
 
 function save_label(output_dir, mask, filename)
     % Convert logical mask to vertex indices
