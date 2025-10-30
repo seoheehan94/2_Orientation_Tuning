@@ -19,7 +19,7 @@ figRoi=1;
 isplit=3;
 
 toSavePdf = 0;
-imgFormat = 'jpg';
+imgFormat = 'png';
 %subjects = [1:8];
 subjects = [1:8];
 
@@ -117,11 +117,6 @@ for condition = 1:3 %1=photoSP, 2=ldSP, 3=contour
     end
 end
 
-% ifig=ifig+1; h=figure(ifig); clf;
-% rows=2;
-% cols = 4;
-% isubplot=0;
-
 
 % constColor = [133,149,225]/255;
 % fullColor = [224,123,145]/255;%pinkish red
@@ -136,8 +131,8 @@ color_contour = [141,213,147]/255;
 iroi=figRoi;
 %%
 %histogram of R2 for all three models
-%isubplot=isubplot+1; subplot(rows,cols,isubplot);
-histogram(allNsdOriR2{2, iroi}(isplit,:),nhistbins,'faceColor',color_lsSP,'faceAlpha',histAlpha,'Normalization','probability'); hold on;
+fig = figure;
+histogram(allNsdOriR2{2, iroi}(isplit,:),nhistbins,'faceColor',color_ldSP,'faceAlpha',histAlpha,'Normalization','probability'); hold on;
 histogram(allNsdOriR2{3, iroi}(isplit,:),nhistbins,'faceColor',color_contour,'faceAlpha',histAlpha,'Normalization','probability'); hold on;
 histogram(allNsdOriR2{1, iroi}(isplit,:),nhistbins,'faceColor',color_photoSP,'faceAlpha',histAlpha,'Normalization','probability'); hold on;
 
@@ -145,6 +140,11 @@ xlabel('\itR^2');
 ylabel('\itproportion of voxels');
 legend('\itLine Drawing-Steerable Pyramid','\itContour', '\itPhoto-Steerable Pyramid');
 axis square
+
+exportgraphics(fig, [figFolder, 'R2histogram.pdf'])
+exportgraphics(fig, [figFolder, 'R2histogram.png'])
+
+
 mean(allNsdOriR2{1,iroi}(isplit,:))
 mean(allNsdOriR2{2,iroi}(isplit,:))
 mean(allNsdOriR2{3,iroi}(isplit,:))
@@ -155,7 +155,12 @@ mean(allNsdOriR2{3,iroi}(isplit,:))
 [corrR2, pCorrR2] = corr(allNsdOriCorr{1,iroi}(isplit,:)',allNsdOriCorr{3,iroi}(isplit,:)')
 
 %% scatter plot of full R2 vs. constrained R2
-% isubplot=isubplot+1; subplot(rows,cols,isubplot);
+ ifig=ifig+1; h=figure(ifig); clf;
+ rows=4;
+ cols = 3;
+ isubplot=0;
+
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 scatter(allNsdOriR2{1, iroi}(isplit,:),allNsdOriR2{2, iroi}(isplit,:),markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 xlim([0 0.2]); ylim([0 0.2]);
 axis square
@@ -163,6 +168,7 @@ xlabel('\itPhoto-Steerable Pyramid R^2');
 ylabel('\itLine Drawing-Steerable Pyramid R^2');
 box on
 
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 scatter(allNsdOriR2{1, iroi}(isplit,:),allNsdOriR2{3, iroi}(isplit,:),markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 xlim([0 0.2]); ylim([0 0.2]);
 axis square
@@ -170,6 +176,7 @@ xlabel('\itPhoto-Steerable Pyramid R^2');
 ylabel('\itContour R^2');
 box on
 
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 scatter(allNsdOriR2{2, iroi}(isplit,:),allNsdOriR2{3, iroi}(isplit,:),markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 xlim([0 0.2]); ylim([0 0.2]);
 axis square
@@ -179,7 +186,7 @@ box on
 
 %% pRF R2
 % Photo-Steerable Pyramid R2  vs. pRF R2
-% isubplot=isubplot+1; subplot(rows,cols,isubplot);
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 scatter(allPrfR2{1, iroi}./100,allNsdOriR2{1, iroi}(isplit,:),markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 xlim([0 1]);  ylim([0 0.2]); %ylim([0 1]);
 axis square
@@ -195,6 +202,7 @@ p=plot(rBinCenters,binData,'color',color_photoSP,'linestyle','-','linewidth',lin
 [corrConstR2PrfR2, pCorrConstR2PrfR2] = corr(allNsdOriR2{1, iroi}(isplit,:)',allPrfR2{1, iroi}./100,'type','Pearson')
 
 % Line Drawing-Steerable Pyramid R2  vs. pRF R2
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 scatter(allPrfR2{2, iroi}./100,allNsdOriR2{2, iroi}(isplit,:),markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 xlim([0 1]);  ylim([0 0.2]); %ylim([0 1]);
 axis square
@@ -210,11 +218,12 @@ p=plot(rBinCenters,binData,'color',color_ldSP,'linestyle','-','linewidth',linewi
 [corrConstR2PrfR2, pCorrConstR2PrfR2] = corr(allNsdOriR2{2, iroi}(isplit,:)',allPrfR2{2, iroi}./100,'type','Pearson')
 
 % Contour R2  vs. pRF R2
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 scatter(allPrfR2{3, iroi}./100,allNsdOriR2{3, iroi}(isplit,:),markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 xlim([0 1]);  ylim([0 0.2]); %ylim([0 1]);
 axis square
 xlabel('\itpRF R^2');
-ylabel('\itLine Drawing-Steerable Pyramid R^2');
+ylabel('\itContour R^2');
 box on
 hold on
 temp = allNsdOriR2{3, iroi}(isplit,:);
@@ -226,6 +235,7 @@ p=plot(rBinCenters,binData,'color',color_contour,'linestyle','-','linewidth',lin
 
 %% improvement  vs. pRF R2
 % ldSP - photoSP vs. pRF R2
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 improv = allNsdOriR2{2, iroi}(isplit,:) - allNsdOriR2{1, iroi}(isplit,:);
 scatter(allPrfR2{1, iroi}./100,allNsdOriR2{2, iroi}(isplit,:) - allNsdOriR2{1, iroi}(isplit,:),markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 xlim([0 1]);
@@ -243,12 +253,13 @@ ylim([-0.01 0.08]);
 [corrImprovPrfR2, pCorrImprovPrfR2] = corr(temp',allPrfR2{1, iroi}./100,'type','Pearson')
 
 % ldSP - contour vs. pRF R2
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 improv = allNsdOriR2{2, iroi}(isplit,:) - allNsdOriR2{3, iroi}(isplit,:);
 scatter(allPrfR2{1, iroi}./100,allNsdOriR2{2, iroi}(isplit,:) - allNsdOriR2{3, iroi}(isplit,:),markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 xlim([0 1]);
 axis square
 xlabel('\itpRF R^2');
-ylabel('\itldSP R^2 - contour R^2');
+ylabel('\itldSP R^2 - Contour R^2');
 box on
 hold on
 temp = improv;
@@ -260,12 +271,13 @@ ylim([-0.01 0.08]);
 [corrImprovPrfR2, pCorrImprovPrfR2] = corr(temp',allPrfR2{1, iroi}./100,'type','Pearson')
 
 % contour - photoSP vs. pRF R2
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 improv = allNsdOriR2{3, iroi}(isplit,:) - allNsdOriR2{1, iroi}(isplit,:);
 scatter(allPrfR2{1, iroi}./100,allNsdOriR2{3, iroi}(isplit,:) - allNsdOriR2{1, iroi}(isplit,:),markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 xlim([0 1]);
 axis square
 xlabel('\itpRF R^2');
-ylabel('\itcontour R^2 - photoSP R^2');
+ylabel('\itContour R^2 - photoSP R^2');
 box on
 hold on
 temp = improv;
@@ -279,7 +291,7 @@ ylim([-0.01 0.08]);
 
 %% improvement vs. pRF eccentricity
 % ldSP - photoSP vs. pRF eccentricity
-figure;
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 improv = allNsdOriR2{2,iroi}(isplit,:) - allNsdOriR2{1,iroi}(isplit,:);
 temp = improv;
 scatter(allPrfEcc{1,iroi},temp,markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
@@ -296,13 +308,13 @@ xlim([0 10]);
 ylim([-0.01 0.08]);
 
 % ldSP - contour vs. pRF eccentricity
-figure;
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 improv = allNsdOriR2{2,iroi}(isplit,:) - allNsdOriR2{3,iroi}(isplit,:);
 temp = improv;
 scatter(allPrfEcc{1,iroi},temp,markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 axis square
 xlabel('\itpRF eccentricity (deg)');
-ylabel('\itldSP R^2 - contour R^2');
+ylabel('\itldSP R^2 - Contour R^2');
 box on
 hold on
 for ibin=1:nbins
@@ -313,13 +325,13 @@ xlim([0 10]);
 ylim([-0.01 0.08]);
 
 % contour - photoSP vs. pRF eccentricity
-figure;
+isubplot=isubplot+1; subplot(rows,cols,isubplot);
 improv = allNsdOriR2{3,iroi}(isplit,:) - allNsdOriR2{1,iroi}(isplit,:);
 temp = improv;
 scatter(allPrfEcc{1,iroi},temp,markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
 axis square
 xlabel('\itpRF eccentricity (deg)');
-ylabel('\itldSP R^2 - photoSP R^2');
+ylabel('\itContour R^2 - photoSP R^2');
 box on
 hold on
 for ibin=1:nbins
@@ -330,25 +342,25 @@ xlim([0 10]);
 ylim([-0.01 0.08]);
 
 %% scatter plot: pRF R^2 vs. pRF eccentricity
-scatter(allPrfEcc{1, iroi},allPrfR2{1, iroi}/100,markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
-xlim([0 10]);
-axis square
-xlabel('\itpRF eccentricity (deg)');
-ylabel('\itpRF R^2');
-box on
-hold on
-for ibin=1:nbins
-    binData(ibin) = mean(allPrfR2{1, iroi}(allPrfR2{1,iroi}>prfThresh & allPrfEcc{1,iroi}>=binBorders(ibin) & allPrfEcc{iroi}<binBorders(ibin+1))/100);
-end
-plot(binCenters,binData,'color',r2Color,'linestyle','-','linewidth',linewidth);
-ylim([0 1]);
-xlim([0 10]);
-
+% scatter(allPrfEcc{1, iroi},allPrfR2{1, iroi}/100,markersize,markerColor,'MarkerFaceAlpha',0,'MarkerEdgeAlpha',edgeAlpha);
+% xlim([0 10]);
+% axis square
+% xlabel('\itpRF eccentricity (deg)');
+% ylabel('\itpRF R^2');
+% box on
+% hold on
+% for ibin=1:nbins
+%     binData(ibin) = mean(allPrfR2{1, iroi}(allPrfR2{1,iroi}>prfThresh & allPrfEcc{1,iroi}>=binBorders(ibin) & allPrfEcc{iroi}<binBorders(ibin+1))/100);
+% end
+% plot(binCenters,binData,'color',r2Color,'linestyle','-','linewidth',linewidth);
+% ylim([0 1]);
+% xlim([0 10]);
+% 
 %%
-set(gcf,'position',[150 180 940 420]);
-if toSavePdf
-    savepdf(h, [figFolder 'fig2.pdf']);
-    saveas(h, [figFolder 'fig2.' imgFormat]);
-end
+set(gcf,'position',[100 100 1000 1000]);
+
+exportgraphics(h, [figFolder, 'scatterplots.pdf'])
+exportgraphics(h, [figFolder, 'scatterplots.png'])
+
 
 toc

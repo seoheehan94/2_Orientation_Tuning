@@ -41,7 +41,7 @@ backgroundColor(1,1,:) = uint8([127,127,127]);
 fixPoint(1,1,:) = [255 0 0];
 
 
-%% photo - filter
+%% photo - steerable pyramid
 [Xq, Yq] = meshgrid(linspace(1,imgSizeX, interpImgSize), linspace(1,imgSizeY, interpImgSize));
 for irgb=1:3
     interpImg(:,:,irgb) = interp2(squeeze(origImg(:,:,irgb)), Xq, Yq);
@@ -103,7 +103,7 @@ end
 % Save the figure as a PNG file
 %saveas(gcf, '/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/figures/energy_photofilter.png');
 
-%% line drawing - filter
+%% line drawing - steerable pyramid
 vecLD = traceLineDrawingFromRGB(imgFile);
 imgLD = renderLinedrawing(vecLD,[],[357,357]);
 imgLD = rgb2gray((1-imgLD))*255;

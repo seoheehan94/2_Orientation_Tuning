@@ -3,7 +3,7 @@ clear all;
 
 load('/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/experiment/getImages/results_tableTotal.mat')
 modelOriPhoto_folder = '/bwdata/NSDData/Seohee/stimuli/pyramid'; % Original image file folder
-modelOriVecLD_folder = '/bwdata/NSDData/Seohee/stimuli/orientationfilter'; % Original image file folder
+modelOriVecLD_folder = '/bwdata/NSDData/Seohee/stimuli/pyramid/contour'; % Original image file folder
 modelOriLD_folder = '/bwdata/NSDData/Seohee/stimuli/pyramid_LD'; % Original image file folder
 
 %img size
@@ -50,7 +50,7 @@ radius = newRows/2; % Set the radius of the circle
 circularMask = ((xGrid - centerX).^2 + (yGrid - centerY).^2) <= radius^2;
 
 imgList = {'images01/img2114','images01/img4017'};
-imgNum = 2;
+imgNum = 1;
 [~, mainFileName, ~] = fileparts(imgList{imgNum});
 numStr = regexp(mainFileName, '\d+', 'match');  % returns a cell array
 imgIdx = str2double(numStr{1});              % convert to number
@@ -153,97 +153,94 @@ end
 %curM_cropped=permute(curM_cropped, [2 3 1]);
 curM_cropped = curM_cropped - min(curM_cropped(:));
 
-% reshape data so each pixel is a column
-[nTheta, h, w] = size(curM_cropped);
-curM_reshaped = reshape(curM_cropped, [nTheta, h*w]);  % -> 8 x 129600
 
-% compute weighted circular mean for each pixel
-thisImgM = [];
-for curP = 1: size(curM_reshaped,2)
-    thisImgM(curP) = circ_mean(theta', curM_reshaped(:,curP));
+allVals = [];
+for j = 1:8
+    curImg = squeeze(curM_cropped(j,:,:));
+    allVals = [allVals; curImg(:)];
 end
-    
-thisImgM = reshape(thisImgM, h, w);
-thisImgM = mod(thisImgM,2*pi);%from [-pi, pi] to [0 2pi]
-thisImgM = thisImgM./2;%range 0 to pi.
+clim = [min(allVals), max(allVals)];
 
-thisImgM_deg = rad2deg(thisImgM);
-thisImgM_deg = mod(thisImgM_deg, 180);
-
-colorIdxImg = round(thisImgM_deg / 180 * (numCols/2) + 1);
-
-% colour scheme
-fig = figure; imagesc(colorIdxImg);
-set(gca, 'XTick', [], 'YTick', []);
-box on;colormap(cmap);
-caxis([1 numCols]); % ensures proper color scaling
-frame = getframe(gca);
-photoSP_img = frame.cdata;
-photoSP_img = imresize(photoSP_img, [imgWidth,imgHeight]);
-% figure; imshow(LD_img)
-imwrite(photoSP_img, [mainFileName, '_photoSP_map.png']);
-
+% Plot all images with same color limits
+fig = figure;
+t = tiledlayout(2, 4,...
+    'Padding', 'compact', ...   % minimal padding around edges
+    'TileSpacing', 'tight');    % even smaller gaps between tiles
+for j = 1:8
+        nexttile
+        imagesc(squeeze(curM_cropped(j,:,:)), clim); % apply global color scale
+        axis image off;  % remove ticks and preserve aspect ratio
+        box on;
+end
+cb = colorbar;
+cb.Layout.Tile = 'east';
+set(gcf, 'Position', [100 100 1000 500]);
+exportgraphics(fig, [mainFileName, '_photoSP_meanSF_map.png'])
+exportgraphics(fig, [mainFileName, '_photoSP_meanSF_map.pdf'])
 
 
 %% Save photo steerable filter patch
-curM_cropped
+
 for channel = 1:8
     currentChannel_max = curM_cropped(channel, :,:);  % Extract the channel
-    currentChannel_max(~maxMask) = 255;  % Set background to white
+    currentChannel_max(~maxMask) = NaN;  % Set background to white
     maskedImg_max(channel, :,:) = currentChannel_max; % Store it back in rgbImg
     currentChannel_min = curM_cropped(channel, :,:);  % Extract the channel
-    currentChannel_min(~minMask) = 255;  % Set background to white
+    currentChannel_min(~minMask) = NaN;  % Set background to white
     maskedImg_min(channel,:,:) = currentChannel_min; % Store it back in rgbImg
 end
-maskedImg_max = uint8(maskedImg_max);
-maskedImg_min = uint8(maskedImg_min);
+
 croppedMaskedImg_max = maskedImg_max(:,minRow_max:maxRow_max, minCol_max:maxCol_max);
 croppedMaskedImg_min = maskedImg_min(:,minRow_min:maxRow_min, minCol_min:maxCol_min);
 
-%% sanity check
-maxMask = double(maxMask); % Convert to double
-maxMask(maxMask == 0) = NaN;
-maskedImg_max = double(maskedImg_max);
-% Apply the shifted mask to the absolute image
-maskedSection_photo = zeros(8,360,360);
-for i = 1:8
-    maskedSection_photo(i, :, :) = squeeze(maskedImg_max(i, :, :)) .* maxMask;
+
+
+allVals = [];
+for j = 1:8
+    curImg = squeeze(croppedMaskedImg_max(j,:,:));
+    allVals = [allVals; curImg(:)];
 end
-
-maskedSection_photo_reshaped = reshape(maskedSection_photo, [8, h*w]);  % -> 8 x 129600
-
-photo_sum = sum(maskedSection_photo_reshaped,2, "omitnan");
-curM = circ_mean(theta', photo_sum);
-    
-curM = mod(curM,2*pi);%from [-pi, pi] to [0 2pi]
-curM = curM./2;%range 0 to pi.
-
-curM_deg = rad2deg(curM);
-
-figure; imagesc(squeeze(maskedSection_photo(1,:,:)));
-
-%%
-for channel = 1:3
-    currentChannel_max = photoSP_img(:,:,channel);  % Extract the channel
-    currentChannel_max(~maxMask) = 255;  % Set background to white
-    maskedImg_max(:,:,channel) = currentChannel_max; % Store it back in rgbImg
-    currentChannel_min = photoSP_img(:,:,channel);  % Extract the channel
-    currentChannel_min(~minMask) = 255;  % Set background to white
-    maskedImg_min(:,:,channel) = currentChannel_min; % Store it back in rgbImg
+for j = 1:8
+    curImg = squeeze(croppedMaskedImg_min(j,:,:));
+    allVals = [allVals; curImg(:)];
 end
+clim = [min(allVals), max(allVals)];
 
-maskedImg_max = uint8(maskedImg_max);
-maskedImg_min = uint8(maskedImg_min);
-croppedMaskedImg_max = maskedImg_max(minRow_max:maxRow_max, minCol_max:maxCol_max, :);
-croppedMaskedImg_min = maskedImg_min(minRow_min:maxRow_min, minCol_min:maxCol_min, :);
+% Plot all images with same color limits
+fig = figure;
+t = tiledlayout(2, 4,...
+    'Padding', 'compact', ...   % minimal padding around edges
+    'TileSpacing', 'tight');    % even smaller gaps between tiles
+for j = 1:8
+        nexttile
+        imagesc(squeeze(croppedMaskedImg_max(j,:,:)), clim); % apply global color scale
+        axis image off;  % remove ticks and preserve aspect ratio
+        box on;
+end
+cb = colorbar;
+cb.Layout.Tile = 'east';
+set(gcf, 'Position', [100 100 1000 500]);
+exportgraphics(fig, [mainFileName, '_photoSP_meanSF_max.png'])
+exportgraphics(fig, [mainFileName, '_photoSP_meanSF_max.pdf'])
 
-figure; imagesc(croppedMaskedImg_max)
-figure; imagesc(croppedMaskedImg_min)
 
-outputFile_max = fullfile(['img',num2str(imgIdx),'_photoSP_max.png']);
-imwrite(croppedMaskedImg_max, outputFile_max, 'Alpha', croppedAlphaChannel_max);
-outputFile_min = fullfile(['img',num2str(imgIdx),'_photoSP_min.png']);
-imwrite(croppedMaskedImg_min, outputFile_min, 'Alpha', croppedAlphaChannel_min);
+
+% Plot all images with same color limits
+fig = figure;
+t = tiledlayout(2, 4,...
+    'Padding', 'compact', ...   % minimal padding around edges
+    'TileSpacing', 'tight');    % even smaller gaps between tiles
+for j = 1:8
+        nexttile
+        imagesc(squeeze(croppedMaskedImg_min(j,:,:)), clim); % apply global color scale
+        axis image off;  % remove ticks and preserve aspect ratio
+        box on;
+end
+cb = colorbar;
+cb.Layout.Tile = 'east';
+set(gcf, 'Position', [100 100 1000 500]);
+exportgraphics(fig, [mainFileName, '_photoSP_meanSF_min.png'])
+exportgraphics(fig, [mainFileName, '_photoSP_meanSF_min.pdf'])
 
 
 %% LD steerable filter - orientation map
@@ -404,22 +401,22 @@ exportgraphics(fig, [mainFileName, '_photoSP_fullSF_map.pdf'])
 
 
 
-new = zeros(imgWidth, imgHeight);
-for k = 1:7
-        curImg = squeeze(curM_cropped(5,k,:,:));
-        new = new + curImg;
-end
-
-figure; imagesc(new)
-
-
-new = zeros(imgWidth, imgHeight);
-for j = 1:8
-        curImg = squeeze(curM_cropped(j,5,:,:));
-        new = new + curImg;
-end
-
-figure; imagesc(new)
+% new = zeros(imgWidth, imgHeight);
+% for k = 1:7
+%         curImg = squeeze(curM_cropped(5,k,:,:));
+%         new = new + curImg;
+% end
+% 
+% figure; imagesc(new)
+% 
+% 
+% new = zeros(imgWidth, imgHeight);
+% for j = 1:8
+%         curImg = squeeze(curM_cropped(j,5,:,:));
+%         new = new + curImg;
+% end
+% 
+% figure; imagesc(new)
 %% Lined drawing steerable filter - orientation map by spatical frequency & orientation
 
 filename = ['pyrImg' num2str(imgIdx) '.mat'];
