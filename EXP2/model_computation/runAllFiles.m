@@ -58,3 +58,23 @@ for sub = 1:8
     fprintf('%s. %d. %d ...\n','getVoxPref_contour',sub, 3);
     getVoxPref(sub,4, 3);
 end
+
+%% controlAnalysis
+
+for sub = 1:8
+    fprintf('%s. %d. %d ...\n','controlAnalysis',sub, 1);
+    controlAnalysis(sub,4, 1);
+end
+for sub = 1:8
+    fprintf('%s. %d. %d ...\n','controlAnalysis',sub, 2);
+    controlAnalysis(sub,4, 2);
+end
+for sub = 1:8
+    fprintf('%s. %d. %d ...\n','controlAnalysis',sub, 3);
+    controlAnalysis(sub,4, 3);
+end
+
+for sub = 1:8
+    fprintf('%s. %d. %d ...\n','controlAnalysis',sub, 3);
+    controlAnalysis(sub,1);
+end
