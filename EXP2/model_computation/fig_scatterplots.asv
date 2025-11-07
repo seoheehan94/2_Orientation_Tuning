@@ -125,8 +125,8 @@ linewidth=2;
 
 % Base color
 color_photoSP = [133,149,225]/255;
-color_ldSP = [105,213,147]/255; 
-color_contour = [225, 99, 116] / 255;
+color_ldSP = [225, 99, 116] / 255;
+color_contour = [141,213,147]/255;
 
 iroi=figRoi;
 %%
@@ -359,7 +359,7 @@ ylim([-0.01 0.08]);
 %%
 set(gcf,'position',[100 100 1000 1000]);
 
-exportgraphics(h, [figFolder, 'scatterplots.pdf'])
+% exportgraphics(h, [figFolder, 'scatterplots.pdf'])
 % exportgraphics(h, [figFolder, 'scatterplots.png'])
 
 

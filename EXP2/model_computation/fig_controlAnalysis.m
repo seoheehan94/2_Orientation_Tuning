@@ -15,7 +15,7 @@ close all
 clear all
 tic
 
-con = 3;
+con = 1;
 
 if con == 1
     condition = 'ldSPresidual_photoSP';
@@ -78,26 +78,28 @@ for isub=1:length(subjects)
 end
 
 
-% ifig=ifig+1; h=figure(ifig); clf;
-% rows=1;
-% cols=3;
-isplit = nsplits;
-% isubplot=0;
+ ifig=ifig+1; h=figure(ifig); clf;
+ rows=1;
+ cols=1;
+ isplit = nsplits;
+ isubplot=0;
 
 iroi=1;
 
+
 %% RESIDUAL preferred ORIENTATION
-% isubplot=isubplot+1;
-% subplot(rows,cols, isubplot);
+isubplot=isubplot+1;
+subplot(rows,cols, isubplot);
 %plotOriLines(allResidOri{iroi}(isplit,:), allPrfX{iroi}, allPrfY{iroi}, allPrfEcc{iroi},(0.4*allNsdOriR2{iroi}(isplit,:)));
-fig=figure;
+set(gca, 'FontName', 'Helvetica', 'FontSize', 18, 'FontAngle', 'normal');
 plotOriLines(allResidOri{iroi}(isplit,:), allPrfX{iroi}, allPrfY{iroi}, allPrfEcc{iroi},(3*allNsdOriR2{iroi}(isplit,:)));
 
-xlabel('\itx position (deg)');
-ylabel('\ity position (deg)');
+% xlabel('\itx position (deg)');
+% ylabel('\ity position (deg)');
 
-exportgraphics(fig, ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/figures/' condition, '.png'])
-exportgraphics(fig, ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/figures/' condition, '.pdf'])
+exportgraphics(h, ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/figures/' condition, '.png'])
+exportgraphics(h, ['/bwlab/Users/SeoheeHan/NSDData/rothzn/nsd/Orientation/figures/' condition, '.pdf'])
+
 
 toc
 %%
@@ -107,10 +109,8 @@ minWidth = 0.001;
 r2(isnan(r2)) = minWidth;
 r2(r2<minWidth) = minWidth;
 numvox = length(prefOri);
-
 lineWidth = 0.01*r2;
 lineLength = 0.4*r2;
-
 cMap = turbo(256);
 
 for ivox=1:numvox
@@ -140,5 +140,6 @@ set(gca,'yTick',[-interpSz/2 0 interpSz/2]);
 set(gca,'yTicklabels',{-degPerPix*interpSz/2, 0, degPerPix*interpSz/2});
 box on
 axis square
+set(gca, 'LineWidth', 1.5);
 
 end

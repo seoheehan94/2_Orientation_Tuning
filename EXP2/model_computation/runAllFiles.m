@@ -73,8 +73,3 @@ for sub = 1:8
     fprintf('%s. %d. %d ...\n','controlAnalysis',sub, 3);
     controlAnalysis(sub,4, 3);
 end
-
-for sub = 1:8
-    fprintf('%s. %d. %d ...\n','controlAnalysis',sub, 3);
-    controlAnalysis(sub,1);
-end
