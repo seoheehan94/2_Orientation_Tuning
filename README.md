@@ -11,7 +11,7 @@ Orientation Judgement Experiment
      - Orientation computed by Steerable pyramid filter from Roth et al. (2022) (https://github.com/elimerriam/nsdOtopy)
      - Orientation computed by Contour from Walther et al. (2023) (https://github.com/bwlabToronto/MLV_toolbox)
    - makeGratings.m: generate grating images used for experiment stimuli
-   - saveImages.m: saves figures for paper
+   - fig_sampleImages.m: sample orientation responses
  - runExperiment: psychophysics experiment files for exp1a and exp1b
  - dataAnalysis: experiment data and analysis for exp1a and exp1b
   
@@ -35,6 +35,7 @@ Three models
    - saveEccentricity.m: analyze, plot, and save R2 by eccentricity
    - controlAnalysis.m: control analysis where the second model is fit to the residuals of the first model
    - fig_scatterplots.m: scatterplots of R2/prf R2/prf eccentricity for V1
+   - fig_sampleImages.m: sample orientation responses
    - fig_preferredOri.m: plot preferred orientations for V1
    - fig_quantPlot.m: Quantitative plots of the deviation of preferred orientation from three idealized orientation preference maps
    - fig_modelOriResponses.m: sample orientation responses for model figure
