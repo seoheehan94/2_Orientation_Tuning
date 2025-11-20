@@ -46,7 +46,7 @@ centerY = newRows / 2;
 radius = newRows/2; % Set the radius of the circle
     
 % Create a binary mask for the circle
-[xGrid, yGrid] = meshgrid(1:imgHeight, 1:imgWidth);
+[xGrid, yGrid] = meshgrid(1:imgWidth, 1:imgHeight);
 circularMask = ((xGrid - centerX).^2 + (yGrid - centerY).^2) <= radius^2;
 
 imgList = {'images01/img2114'};
@@ -58,7 +58,7 @@ imgIdx = str2double(numStr{1});              % convert to number
 %% Photograph
 photoImg = imread(['/bwdata/NSDData/stimuli/',imgList{imgNum},'.png']);
 photoImg = rgb2gray(photoImg);
-photoImg = imresize(photoImg, [imgWidth,imgHeight]);
+photoImg = imresize(photoImg, [imgHeight, imgWidth]);
 figure;imshow(photoImg)
 imwrite(photoImg, [mainFileName, '_grey.png']); 
 
@@ -70,13 +70,13 @@ imgLD = squeeze(imgLD(:,:,1)); % use grayscale encoding
 fig=figure; drawLinedrawing(vecLD); box on; set(gca, 'XTick', [],'YTick', []);      % (optional)
 frame = getframe(gca);
 LD_img = frame.cdata;
-LD_img = imresize(LD_img, [imgWidth,imgHeight]);
+LD_img = imresize(LD_img, [imgHeight, imgWidth]);
 imwrite(LD_img,strcat(mainFileName, '_LD.png'));
 
 %% Contour - orientation map
 filename = ['oriImg' num2str(imgIdx) '.mat'];
 load(fullfile(modelOriVecLD_folder, filename), 'oriMap');
-oriMap_cropped = imcrop(oriMap, [topLeft(1), topLeft(2), imgWidth-1, imgHeight-1]);
+oriMap_cropped = imcrop(oriMap, [topLeft(1), topLeft(2), imgHeight-1, imgWidth-1]);
 reverseIdx = (oriMap_cropped < 0); % Identify values modified in original operation
 oriMap_cropped(reverseIdx) = oriMap_cropped(reverseIdx) + 180; % Add 180 back to reverse the previous operation
 
@@ -93,7 +93,7 @@ caxis([1 numCols]); % ensures proper color scaling
 axis image;
 frame = getframe(gca);
 LD_img = frame.cdata;
-LD_img = imresize(LD_img, [imgWidth,imgHeight]);
+LD_img = imresize(LD_img, [imgHeight, imgWidth]);
 % figure; imshow(LD_img)
 imwrite(LD_img, [mainFileName, '_LD_coloured.png']);
 
@@ -154,10 +154,10 @@ filename = ['pyrImg' num2str(imgIdx) '.mat'];
 load(fullfile(modelOriPhoto_folder, filename), 'modelOri');
 curModelOri = cat(4, modelOri{:});
 curM = squeeze(mean(curModelOri,4));
-curM_cropped = zeros(8,imgWidth, imgHeight);
+curM_cropped = zeros(8,imgHeight, imgWidth);
 for j = 1:8
     img = squeeze(curM(j, :, :));
-    img_cropped = imcrop(img, [topLeft(1), topLeft(2), imgWidth-1, imgHeight-1]);
+    img_cropped = imcrop(img, [topLeft(1), topLeft(2), imgHeight-1, imgWidth-1]);
     curM_cropped(j, :, :) = img_cropped;
 end
 %curM_cropped=permute(curM_cropped, [2 3 1]);
